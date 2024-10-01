@@ -73,3 +73,12 @@ dist/
 
 # Windows specific files
 Thumbs.db
+
+# General ignores for React
+node_modules/
+dist/
+.env
+.DS_Store
+
+# Ignore the backend directory
+../volleyball-back/

@@ -73,3 +73,15 @@ dist/
 
 # Windows specific files
 Thumbs.db
+
+# General ignores
+.DS_Store
+*.pyc
+__pycache__/
+env/
+venv/
+db.sqlite3
+db.sqlite3-journal
+
+# Ignore the frontend directory
+../volleyball-app/

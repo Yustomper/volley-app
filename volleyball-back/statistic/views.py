@@ -27,12 +27,11 @@ class StatisticsView(APIView):
             stats.top_scorer_name = top_scorer['player__name']
             stats.top_scorer_score = top_scorer['total_score']
         
-        # Equipo con más victorias
-        # Contar los sets ganados por equipo
+       
         home_wins = Set.objects.filter(home_team_score__gt=F('away_team_score')).values('match__home_team__name').annotate(count=Count('id'))
         away_wins = Set.objects.filter(away_team_score__gt=F('home_team_score')).values('match__away_team__name').annotate(count=Count('id'))
         
-        # Combinar conteos
+        
         wins_count = {}
         for win in home_wins:
             team_name = win['match__home_team__name']

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTheme } from '../context/ThemeContext'; // Asumo que ya tienes este context
+import api from '../services/api';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -28,20 +29,9 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
+      // Usa el servicio API para registrar al usuario
+      await api.register(userData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error en el registro');
-      }
-
-      const data = await response.json();
       toast.success('Cuenta creada con éxito');
 
       // Esperar 4 segundos antes de redirigir
@@ -49,7 +39,11 @@ const Register = () => {
         navigate('/login');
       }, 4000);
     } catch (error) {
-      toast.error(error.message);
+      if (error.response) {
+        toast.error(error.response.data.error || 'Error en el registro');
+      } else {
+        toast.error('Error al procesar la solicitud');
+      }
     }
   };
 

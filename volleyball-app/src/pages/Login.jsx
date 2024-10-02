@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
+import api from '../services/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login/', formData);
+      const response = await api.login(formData);
       const { token } = response.data;
       
       await login(token);

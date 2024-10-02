@@ -32,7 +32,7 @@ DEBUG = os.getenv("DEBUG") == "True"  # Convertir el valor de string a booleano
 
 # Agrega tus dominios permitidos
 # Cambia esto por tus orígenes permitidos
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 # Application definition
 

@@ -13,3 +13,6 @@ rpds-py==0.20.0
 sqlparse==0.5.1
 tzdata==2024.2
 uritemplate==4.1.1
+python-dotenv
+psycopg2
+gunicorn

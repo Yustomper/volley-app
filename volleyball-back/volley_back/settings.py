@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,12 +25,21 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+if not SECRET_KEY:
+    raise ValueError(
+        "El SECRET_KEY no está configurado en las variables de entorno.")
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG") == "True"  # Convertir el valor de string a booleano
+# Convertir el valor de string a booleano
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 # Agrega tus dominios permitidos
-# Cambia esto por tus orígenes permitidos
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+
+if not ALLOWED_HOSTS:
+    raise ValueError(
+        "Los ALLOWED_HOSTS no están configurados correctamente en las variables de entorno.")
+
 
 # Application definition
 
@@ -112,6 +120,9 @@ DATABASES = {
     }
 }
 
+if not all([DATABASES['default']['NAME'], DATABASES['default']['USER'], DATABASES['default']['PASSWORD'], DATABASES['default']['HOST']]):
+    raise ValueError(
+        "La configuración de la base de datos no está completa en las variables de entorno.")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -146,6 +157,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -155,7 +167,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuración de CORS
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
 
+if not CORS_ALLOWED_ORIGINS[0]:
+    raise ValueError(
+        "CORS_ALLOWED_ORIGINS no está configurado en las variables de entorno.")
+
 
 # Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Puerto para Render
+PORT = os.getenv('PORT', 8000)

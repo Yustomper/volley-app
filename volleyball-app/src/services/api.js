@@ -1,48 +1,58 @@
+// src/services/api.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api'; // Replace with your actual API base URL
+const API_URL = import.meta.env.VITE_BACKEND_API;
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast';
 
+// Función para crear una instancia de axios con el token
+const createAxiosInstance = () => {
+  const token = localStorage.getItem('token');
+  return axios.create({
+    baseURL: API_URL,
+    headers: token ? { Authorization: `Token ${token}` } : {}
+  });
+};
+
 const api = {
-  // Authentication
-  login: (credentials) => axios.post(`${API_BASE_URL}/auth/login/`, credentials),
-  logout: () => axios.post(`${API_BASE_URL}/auth/logout/`),
-  getCurrentUser: () => axios.get(`${API_BASE_URL}/auth/user/`),
+  // Autenticación
+  login: (credentials) => axios.post(`${API_URL}/api/auth/login/`, credentials),
+  register: (userData) => axios.post(`${API_URL}/api/auth/register/`, userData),
+  logout: () => createAxiosInstance().post(`${API_URL}/api/auth/logout/`),
+  
+  // Usuario
+  getCurrentUser: () => createAxiosInstance().get(`${API_URL}/api/auth/user/`),
 
-  // Teams
-  getTeams: () => axios.get(`${API_BASE_URL}/teams/`),
-  getTeam: (id) => axios.get(`${API_BASE_URL}/teams/${id}/`),
-  createTeam: (teamData) => axios.post(`${API_BASE_URL}/teams/`, teamData),
-  updateTeam: (id, teamData) => axios.put(`${API_BASE_URL}/teams/${id}/`, teamData),
-  deleteTeam: (id) => axios.delete(`${API_BASE_URL}/teams/${id}/`),
+  // Equipos
+  getTeams: () => createAxiosInstance().get(`${API_URL}/api/teams/`),
+  createTeam: (teamData) => createAxiosInstance().post(`${API_URL}/api/teams/`, teamData),
+  updateTeam: (teamId, teamData) => createAxiosInstance().put(`${API_URL}/api/teams/${teamId}/`, teamData),
+  deleteTeam: (teamId) => createAxiosInstance().delete(`${API_URL}/api/teams/${teamId}/`),
 
-  // Players
-  getPlayers: () => axios.get(`${API_BASE_URL}/players/`),
-  getPlayer: (id) => axios.get(`${API_BASE_URL}/players/${id}/`),
-  createPlayer: (playerData) => axios.post(`${API_BASE_URL}/players/`, playerData),
-  updatePlayer: (id, playerData) => axios.put(`${API_BASE_URL}/players/${id}/`, playerData),
-  deletePlayer: (id) => axios.delete(`${API_BASE_URL}/players/${id}/`),
+  // Jugadores
+  getPlayers: () => createAxiosInstance().get(`${API_URL}/api/teams/players/`),
+  createPlayer: (playerData) => createAxiosInstance().post(`${API_URL}/api/teams/players/`, playerData),
+  updatePlayer: (playerId, playerData) => createAxiosInstance().put(`${API_URL}/api/teams/players/${playerId}/`, playerData),
+  deletePlayer: (playerId) => createAxiosInstance().delete(`${API_URL}/api/teams/players/${playerId}/`),
 
-  // Matches
-  getMatches: () => axios.get(`${API_BASE_URL}/matches/`),
-  getMatch: (id) => axios.get(`${API_BASE_URL}/matches/${id}/`),
-  createMatch: (matchData) => axios.post(`${API_BASE_URL}/matches/`, matchData),
-  updateMatch: (id, matchData) => axios.put(`${API_BASE_URL}/matches/${id}/`, matchData),
-  deleteMatch: (id) => axios.delete(`${API_BASE_URL}/matches/${id}/`),
+  // Partidos
+  getMatches: () => createAxiosInstance().get(`${API_URL}/api/matches/`),
+  getMatch: (id) => createAxiosInstance().get(`${API_URL}/api/matches/${id}/`),
+  createMatch: (matchData) => createAxiosInstance().post(`${API_URL}/api/matches/`, matchData),
+  updateMatch: (id, matchData) => createAxiosInstance().put(`${API_URL}/api/matches/${id}/`, matchData),
+  deleteMatch: (id) => createAxiosInstance().delete(`${API_URL}/api/matches/${id}/`),
 
   // Sets
-  getSets: (matchId) => axios.get(`${API_BASE_URL}/matches/${matchId}/sets/`),
-  createSet: (matchId, setData) => axios.post(`${API_BASE_URL}/matches/${matchId}/sets/`, setData),
-  updateSet: (matchId, setId, setData) => axios.put(`${API_BASE_URL}/matches/${matchId}/sets/${setId}/`, setData),
-  deleteSet: (matchId, setId) => axios.delete(`${API_BASE_URL}/matches/${matchId}/sets/${setId}/`),
+  createSet: (setData) => createAxiosInstance().post(`${API_URL}/api/matches/sets/`, setData),
+  updateSet: (id, setData) => createAxiosInstance().put(`${API_URL}/api/matches/sets/${id}/`, setData),
 
-  // Player Performances
-  getPlayerPerformances: (matchId) => axios.get(`${API_BASE_URL}/matches/${matchId}/performances/`),
-  createPlayerPerformance: (matchId, performanceData) => axios.post(`${API_BASE_URL}/matches/${matchId}/performances/`, performanceData),
-  updatePlayerPerformance: (matchId, performanceId, performanceData) => axios.put(`${API_BASE_URL}/matches/${matchId}/performances/${performanceId}/`, performanceData),
-  deletePlayerPerformance: (matchId, performanceId) => axios.delete(`${API_BASE_URL}/matches/${matchId}/performances/${performanceId}/`),
+  // Rendimiento del jugador
+  createPlayerPerformance: (performanceData) => createAxiosInstance().post(`${API_URL}/api/matches/performances/`, performanceData),
+  updatePlayerPerformance: (id, performanceData) => createAxiosInstance().put(`${API_URL}/api/matches/performances/${id}/`, performanceData),
 
-  // Weather
+  // Estadísticas
+  getStatistics: () => axios.get(`${API_URL}/api/statistics/`),
+
+  // Clima
   getWeather: async (location, date) => {
     try {
       // This is a simplified example. In a real-world scenario, you'd need to implement geocoding.

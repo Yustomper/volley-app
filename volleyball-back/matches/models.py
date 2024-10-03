@@ -1,11 +1,14 @@
 from django.db import models
 from teams.models import Team, Player
 
+# matches/models.py
 class Match(models.Model):
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_matches')
     away_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='away_matches')
     date = models.DateTimeField()
     location = models.CharField(max_length=255)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_finished = models.BooleanField(default=False)
 
     def __str__(self):

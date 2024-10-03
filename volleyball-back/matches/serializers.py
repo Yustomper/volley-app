@@ -15,6 +15,7 @@ class PlayerPerformanceSerializer(serializers.ModelSerializer):
         model = PlayerPerformance
         fields = ['id', 'player', 'player_name', 'points', 'blocks', 'aces', 'digs']
 
+# matches/serializers.py
 class MatchSerializer(serializers.ModelSerializer):
     home_team = TeamSerializer(read_only=True)
     away_team = TeamSerializer(read_only=True)
@@ -25,10 +26,5 @@ class MatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Match
-        fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 'location', 'is_finished', 'sets', 'player_performances']
-
-    def create(self, validated_data):
-        home_team = validated_data.pop('home_team')
-        away_team = validated_data.pop('away_team')
-        match = Match.objects.create(home_team=home_team, away_team=away_team, **validated_data)
-        return match
+        fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 
+                 'location', 'latitude', 'longitude', 'is_finished', 'sets', 'player_performances']

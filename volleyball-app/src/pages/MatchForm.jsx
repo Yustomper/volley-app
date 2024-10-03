@@ -4,6 +4,8 @@ import { useTheme } from '../context/ThemeContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../services/api';
+import { weatherService } from '../services/weatherService';
+import debounce from 'lodash/debounce';
 
 const MatchForm = () => {
   const { isDarkMode } = useTheme();
@@ -14,9 +16,13 @@ const MatchForm = () => {
     away_team_id: '',
     date: '',
     location: '',
+    latitude: null,
+    longitude: null,
     is_finished: false,
   });
-  const [teams, setTeams] = useState([]); // Inicializa teams como un array vacío
+  const [teams, setTeams] = useState([]);
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     fetchTeams();
@@ -31,6 +37,7 @@ const MatchForm = () => {
       setTeams(response.data);
     } catch (error) {
       console.error('Error fetching teams:', error);
+      toast.error('Error al cargar los equipos');
     }
   };
 
@@ -40,7 +47,51 @@ const MatchForm = () => {
       setMatch(response.data);
     } catch (error) {
       console.error('Error fetching match:', error);
+      toast.error('Error al cargar el partido');
     }
+  };
+
+  const searchLocation = debounce(async (searchTerm) => {
+    if (!searchTerm) {
+      setLocationSuggestions([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const results = await weatherService.searchLocations(searchTerm);
+      setLocationSuggestions(results.map(result => ({
+        name: result.name,
+        country: result.country,
+        latitude: result.latitude,
+        longitude: result.longitude
+      })));
+    } catch (error) {
+      console.error('Error searching location:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, 300);
+
+  const handleLocationChange = (e) => {
+    const searchTerm = e.target.value;
+    setMatch(prevMatch => ({
+      ...prevMatch,
+      location: searchTerm,
+      latitude: null,
+      longitude: null
+    }));
+    searchLocation(searchTerm);
+  };
+
+  const handleLocationSelect = (suggestion) => {
+    setMatch(prevMatch => ({
+      ...prevMatch,
+      location: `${suggestion.name}, ${suggestion.country}`,
+      latitude: suggestion.latitude,
+      longitude: suggestion.longitude
+    }));
+    setLocationSuggestions([]);
   };
 
   const handleChange = (e) => {
@@ -63,7 +114,7 @@ const MatchForm = () => {
       }
       setTimeout(() => {
         navigate('/matches');
-      }, 1500);  // Espera un momento antes de redirigir para que el toast se vea
+      }, 1500);
     } catch (error) {
       toast.error('Error al guardar el partido');
       console.error('Error saving match:', error);
@@ -79,7 +130,7 @@ const MatchForm = () => {
         </h1>
         <form onSubmit={handleSubmit} className="max-w-lg mx-auto">
           <div className="mb-4">
-            <label htmlFor="home_team_id" className="block mb-2">Equipo 1</label>
+            <label htmlFor="home_team_id" className="block mb-2">Equipo Local</label>
             <select
               id="home_team_id"
               name="home_team_id"
@@ -88,14 +139,15 @@ const MatchForm = () => {
               className={`w-full p-2 rounded ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
               required
             >
-              <option value="">Seleccionar equipo 1</option>
-              {Array.isArray(teams) && teams.map(team => (
+              <option value="">Seleccionar equipo local</option>
+              {teams.map(team => (
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>
           </div>
+          
           <div className="mb-4">
-            <label htmlFor="away_team_id" className="block mb-2">Equipo 2</label>
+            <label htmlFor="away_team_id" className="block mb-2">Equipo Visitante</label>
             <select
               id="away_team_id"
               name="away_team_id"
@@ -104,12 +156,13 @@ const MatchForm = () => {
               className={`w-full p-2 rounded ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
               required
             >
-              <option value="">Seleccionar equipo 2</option>
+              <option value="">Seleccionar equipo visitante</option>
               {teams.map(team => (
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>
           </div>
+
           <div className="mb-4">
             <label htmlFor="date" className="block mb-2">Fecha y Hora</label>
             <input
@@ -122,18 +175,44 @@ const MatchForm = () => {
               required
             />
           </div>
-          <div className="mb-4">
+          
+          <div className="mb-4 relative">
             <label htmlFor="location" className="block mb-2">Ubicación</label>
             <input
               type="text"
               id="location"
               name="location"
               value={match.location}
-              onChange={handleChange}
+              onChange={handleLocationChange}
               className={`w-full p-2 rounded ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
               required
             />
+            {isSearching && (
+              <div className="absolute right-3 top-10">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+            {locationSuggestions.length > 0 && (
+              <div className={`absolute z-10 w-full mt-1 rounded-md shadow-lg ${
+                isDarkMode ? 'bg-gray-800' : 'bg-white'
+              }`}>
+                {locationSuggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 cursor-pointer ${
+                      isDarkMode 
+                        ? 'hover:bg-gray-700' 
+                        : 'hover:bg-gray-100'
+                    }`}
+                    onClick={() => handleLocationSelect(suggestion)}
+                  >
+                    {suggestion.name}, {suggestion.country}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+
           <div className="mb-4">
             <label className="flex items-center">
               <input
@@ -146,6 +225,7 @@ const MatchForm = () => {
               Partido finalizado
             </label>
           </div>
+          
           <button
             type="submit"
             className={`w-full p-2 rounded ${

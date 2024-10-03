@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Match, Set, PlayerPerformance
+from teams.models import Team
+from teams.serializers import TeamSerializer
 
 class SetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,11 +16,19 @@ class PlayerPerformanceSerializer(serializers.ModelSerializer):
         fields = ['id', 'player', 'player_name', 'points', 'blocks', 'aces', 'digs']
 
 class MatchSerializer(serializers.ModelSerializer):
+    home_team = TeamSerializer(read_only=True)
+    away_team = TeamSerializer(read_only=True)
+    home_team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), source='home_team', write_only=True)
+    away_team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), source='away_team', write_only=True)
     sets = SetSerializer(many=True, read_only=True)
     player_performances = PlayerPerformanceSerializer(many=True, read_only=True)
-    home_team_name = serializers.CharField(source='home_team.name', read_only=True)
-    away_team_name = serializers.CharField(source='away_team.name', read_only=True)
 
     class Meta:
         model = Match
-        fields = ['id', 'home_team', 'away_team', 'home_team_name', 'away_team_name', 'date', 'location', 'is_finished', 'sets', 'player_performances']
+        fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 'location', 'is_finished', 'sets', 'player_performances']
+
+    def create(self, validated_data):
+        home_team = validated_data.pop('home_team')
+        away_team = validated_data.pop('away_team')
+        match = Match.objects.create(home_team=home_team, away_team=away_team, **validated_data)
+        return match

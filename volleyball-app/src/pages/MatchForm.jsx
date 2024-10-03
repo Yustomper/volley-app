@@ -1,8 +1,8 @@
-// src/pages/MatchForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import api from '../services/api';
 
 const MatchForm = () => {
@@ -10,14 +10,13 @@ const MatchForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [match, setMatch] = useState({
-    home_team: '',
-    away_team: '',
+    home_team_id: '',
+    away_team_id: '',
     date: '',
     location: '',
     is_finished: false,
   });
-  const [teams, setTeams] = useState([]);  // Inicializa teams como un array vacío
-
+  const [teams, setTeams] = useState([]); // Inicializa teams como un array vacío
 
   useEffect(() => {
     fetchTeams();
@@ -57,49 +56,55 @@ const MatchForm = () => {
     try {
       if (id) {
         await api.updateMatch(id, match);
+        toast.success('Partido actualizado correctamente');
       } else {
         await api.createMatch(match);
+        toast.success('Partido creado correctamente');
       }
-      navigate('/matches');
+      setTimeout(() => {
+        navigate('/matches');
+      }, 1500);  // Espera un momento antes de redirigir para que el toast se vea
     } catch (error) {
+      toast.error('Error al guardar el partido');
       console.error('Error saving match:', error);
     }
   };
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
+      <ToastContainer />
       <div className="container mx-auto px-4 py-8">
         <h1 className={`text-4xl font-bold mb-8 ${isDarkMode ? 'text-purple-400' : 'text-pink-600'}`}>
           {id ? 'Editar Partido' : 'Crear Partido'}
         </h1>
         <form onSubmit={handleSubmit} className="max-w-lg mx-auto">
           <div className="mb-4">
-            <label htmlFor="home_team" className="block mb-2">Equipo Local</label>
+            <label htmlFor="home_team_id" className="block mb-2">Equipo 1</label>
             <select
-              id="home_team"
-              name="home_team"
-              value={match.home_team}
+              id="home_team_id"
+              name="home_team_id"
+              value={match.home_team_id}
               onChange={handleChange}
               className={`w-full p-2 rounded ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
               required
             >
-              <option value="">Seleccionar equipo local</option>
+              <option value="">Seleccionar equipo 1</option>
               {Array.isArray(teams) && teams.map(team => (
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>
           </div>
           <div className="mb-4">
-            <label htmlFor="away_team" className="block mb-2">Equipo Visitante</label>
+            <label htmlFor="away_team_id" className="block mb-2">Equipo 2</label>
             <select
-              id="away_team"
-              name="away_team"
-              value={match.away_team}
+              id="away_team_id"
+              name="away_team_id"
+              value={match.away_team_id}
               onChange={handleChange}
               className={`w-full p-2 rounded ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}
               required
             >
-              <option value="">Seleccionar equipo visitante</option>
+              <option value="">Seleccionar equipo 2</option>
               {teams.map(team => (
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}

@@ -2,7 +2,7 @@
 
 from django.urls import path, include
 from django.contrib import admin
-rom django.http import HttpResponse
+from django.http import HttpResponse
 
 
 def index(request):

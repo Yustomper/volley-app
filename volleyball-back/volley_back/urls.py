@@ -1,7 +1,12 @@
 # urls.py
 
-from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+rom django.http import HttpResponse
+
+
+def index(request):
+    return HttpResponse("Bienvenido a la API de Volley. Use /api/ para acceder a los endpoints.")
 
 
 urlpatterns = [

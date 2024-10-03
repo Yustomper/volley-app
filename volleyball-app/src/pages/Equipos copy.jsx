@@ -21,14 +21,11 @@ const Equipos = () => {
   const fetchTeams = async () => {
     try {
       const response = await api.getTeams();
-      console.log('API response for teams:', response.data);  // Verifica los datos recibidos
       setTeams(response.data);
     } catch (error) {
       console.error('Error fetching teams:', error);
-      setTeams([]);  // Asegúrate de que teams sea un array vacío en caso de error
     }
   };
-  
 
   const handleAddTeam = async (team) => {
     try {
@@ -104,52 +101,47 @@ const Equipos = () => {
 
         <h2 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-orange-300' : 'text-orange-500'}`}>Equipos Registrados</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Array.isArray(teams) && teams.length > 0 ? (
-            teams.map((team) => (
-              <div key={team.id} className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>{team.name}</h3>
-                <ul className="space-y-3">
-                  {team.players.map((player) => (
-                    <li key={player.id} className={`flex items-center justify-between space-x-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-2 rounded-lg`}>
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={player.avatar_url || '/placeholder.svg?height=40&width=40'}
-                          alt={player.name}
-                          className="w-10 h-10 rounded-full border-2 border-orange-500"
-                        />
-                        <span className={isDarkMode ? 'text-gray-200' : 'text-gray-800'}>{player.name}</span>
-                        <span className={isDarkMode ? 'text-orange-400' : 'text-orange-500'}>#{player.jersey_number}</span>
-                      </div>
-                      <button 
-                        onClick={() => handleRemovePlayer(team.id, player.id)}
-                        className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-6 flex justify-end space-x-2">
-                  <button 
-                    className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
-                    onClick={() => handleEditTeam(team)}
-                  >
-                    <PencilIcon className="w-5 h-5" />
-                  </button>
-                  <button 
-                    className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
-                    onClick={() => handleRemoveTeam(team.id)}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
+          {teams.map((team) => (
+            <div key={team.id} className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>{team.name}</h3>
+              <ul className="space-y-3">
+                {team.players.map((player) => (
+                  <li key={player.id} className={`flex items-center justify-between space-x-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-2 rounded-lg`}>
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={player.avatar_url || '/placeholder.svg?height=40&width=40'}
+                        alt={player.name}
+                        className="w-10 h-10 rounded-full border-2 border-orange-500"
+                      />
+                      <span className={isDarkMode ? 'text-gray-200' : 'text-gray-800'}>{player.name}</span>
+                      <span className={isDarkMode ? 'text-orange-400' : 'text-orange-500'}>#{player.jersey_number}</span>
+                    </div>
+                    <button 
+                      onClick={() => handleRemovePlayer(team.id, player.id)}
+                      className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex justify-end space-x-2">
+                <button 
+                  className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
+                  onClick={() => handleEditTeam(team)}
+                >
+                  <PencilIcon className="w-5 h-5" />
+                </button>
+                <button 
+                  className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-orange-600 hover:text-orange-700'} transition duration-300`}
+                  onClick={() => handleRemoveTeam(team.id)}
+                >
+                  <TrashIcon className="w-5 h-5" />
+                </button>
               </div>
-            ))
-          ) : (
-            <p>No hay equipos disponibles.</p>
-          )}
+            </div>
+          ))}
         </div>
-
       </div>
 
       <AddTeamModal

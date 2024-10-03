@@ -16,8 +16,7 @@ const MatchForm = () => {
     location: '',
     is_finished: false,
   });
-  const [teams, setTeams] = useState([]);  // Inicializa teams como un array vacío
-
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
     fetchTeams();
@@ -84,7 +83,7 @@ const MatchForm = () => {
               required
             >
               <option value="">Seleccionar equipo local</option>
-              {Array.isArray(teams) && teams.map(team => (
+              {teams.map(team => (
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>

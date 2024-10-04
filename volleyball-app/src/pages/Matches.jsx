@@ -6,6 +6,7 @@ import api from '../services/api';
 const Matches = () => {
   const { isDarkMode } = useTheme();
   const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMatches();
@@ -13,10 +14,13 @@ const Matches = () => {
 
   const fetchMatches = async () => {
     try {
+      setLoading(true);
       const response = await api.getMatches();
       setMatches(response.data);
     } catch (error) {
       console.error('Error fetching matches:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,35 +38,48 @@ const Matches = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {matches.map((match) => (
-            <div key={match.id} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-xl shadow-lg`}>
-              {/* Asegúrate de que la API devuelve estos nombres como home_team.name y away_team.name */}
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
-                {match.home_team?.name} vs {match.away_team?.name}
-              </h3>
-              <p className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Fecha: {new Date(match.date).toLocaleString()}
-              </p>
-              <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Ubicación: {match.location}
-              </p>
-              <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                Estado: {match.is_finished ? 'Finalizado' : 'En progreso'}
-              </p>
-              <Link
-                to={`/match-details/${match.id}`}
-                className={`inline-block px-4 py-2 rounded ${
-                  isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'
-                } text-white transition duration-300`}
-              >
-                Ver detalles
-              </Link>
-            </div>
-          ))}
+          {loading
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <MatchSkeleton key={index} isDarkMode={isDarkMode} />
+              ))
+            : matches.map((match) => (
+                <div key={match.id} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-xl shadow-lg`}>
+                  <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
+                    {match.home_team?.name} vs {match.away_team?.name}
+                  </h3>
+                  <p className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Fecha: {new Date(match.date).toLocaleString()}
+                  </p>
+                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Ubicación: {match.location}
+                  </p>
+                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Estado: {match.is_finished ? 'Finalizado' : 'En progreso'}
+                  </p>
+                  <Link
+                    to={`/match-details/${match.id}`}
+                    className={`inline-block px-4 py-2 rounded ${
+                      isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'
+                    } text-white transition duration-300`}
+                  >
+                    Ver detalles
+                  </Link>
+                </div>
+              ))}
         </div>
       </div>
     </div>
   );
 };
+
+const MatchSkeleton = ({ isDarkMode }) => (
+  <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-xl shadow-lg`}>
+    <div className={`h-8 w-3/4 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-4 animate-pulse`}></div>
+    <div className={`h-4 w-1/2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-2 animate-pulse`}></div>
+    <div className={`h-4 w-2/3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-4 animate-pulse`}></div>
+    <div className={`h-4 w-1/3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-4 animate-pulse`}></div>
+    <div className={`h-10 w-1/3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded animate-pulse`}></div>
+  </div>
+);
 
 export default Matches;

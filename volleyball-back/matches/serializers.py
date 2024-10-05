@@ -15,7 +15,7 @@ class PlayerPerformanceSerializer(serializers.ModelSerializer):
         model = PlayerPerformance
         fields = ['id', 'player', 'player_name', 'points', 'blocks', 'aces', 'digs']
 
-# matches/serializers.py
+
 class MatchSerializer(serializers.ModelSerializer):
     home_team = TeamSerializer(read_only=True)
     away_team = TeamSerializer(read_only=True)

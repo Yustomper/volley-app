@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'teams',
     'matches',
     'statistic',
+    'django_filters',
 
 ]
 

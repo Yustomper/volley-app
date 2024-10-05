@@ -16,6 +16,7 @@ import LiveScoreBoard from './components/LiveScoreBoard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MatchDetails from './pages/MatchDetails';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/match-details/:matchId" element={<MatchDetails />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </div>

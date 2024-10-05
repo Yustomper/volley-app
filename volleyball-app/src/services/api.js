@@ -2,7 +2,6 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_BACKEND_API;
-const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast';
 
 // Función para crear una instancia de axios con el token
 const createAxiosInstance = () => {
@@ -18,21 +17,35 @@ const api = {
   login: (credentials) => axios.post(`${API_URL}/api/auth/login/`, credentials),
   register: (userData) => axios.post(`${API_URL}/api/auth/register/`, userData),
   logout: () => createAxiosInstance().post(`${API_URL}/api/auth/logout/`),
-  
+
   // Usuario
   getCurrentUser: () => createAxiosInstance().get(`${API_URL}/api/auth/user/`),
 
-  // Equipos
-  getTeams: () => createAxiosInstance().get(`${API_URL}/api/teams/`),
-  createTeam: (teamData) => createAxiosInstance().post(`${API_URL}/api/teams/`, teamData),
-  updateTeam: (teamId, teamData) => createAxiosInstance().put(`${API_URL}/api/teams/${teamId}/`, teamData),
-  deleteTeam: (teamId) => createAxiosInstance().delete(`${API_URL}/api/teams/${teamId}/`),
+  // Equipos con paginación, búsqueda y ordenamiento
+  getTeams: ({ page = 1, search = '', ordering = 'name' } = {}) => 
+    createAxiosInstance().get(`/api/teams/`, {
+      params: {
+        page,
+        search,
+        ordering,
+      },
+    }),
+  createTeam: (teamData) => createAxiosInstance().post(`/api/teams/`, teamData),
+  updateTeam: (teamId, teamData) => createAxiosInstance().put(`/api/teams/${teamId}/`, teamData),
+  deleteTeam: (teamId) => createAxiosInstance().delete(`/api/teams/${teamId}/`),
 
-  // Jugadores
-  getPlayers: () => createAxiosInstance().get(`${API_URL}/api/teams/players/`),
-  createPlayer: (playerData) => createAxiosInstance().post(`${API_URL}/api/teams/players/`, playerData),
-  updatePlayer: (playerId, playerData) => createAxiosInstance().put(`${API_URL}/api/teams/players/${playerId}/`, playerData),
-  deletePlayer: (playerId) => createAxiosInstance().delete(`${API_URL}/api/teams/players/${playerId}/`),
+  // Jugadores con paginación, búsqueda y ordenamiento
+  getPlayers: ({ page = 1, search = '', ordering = 'name' } = {}) =>
+    createAxiosInstance().get(`/api/teams/players/`, {
+      params: {
+        page,
+        search,
+        ordering,
+      },
+    }),
+  createPlayer: (playerData) => createAxiosInstance().post(`/api/teams/players/`, playerData),
+  updatePlayer: (playerId, playerData) => createAxiosInstance().put(`/api/teams/players/${playerId}/`, playerData),
+  deletePlayer: (playerId) => createAxiosInstance().delete(`/api/teams/players/${playerId}/`),
 
   // Partidos
   getMatches: () => createAxiosInstance().get(`${API_URL}/api/matches/`),
@@ -52,12 +65,11 @@ const api = {
   // Estadísticas
   getStatistics: () => axios.get(`${API_URL}/api/statistics/`),
 
-  // Clima
+  // Clima (solo como referencia)
   getWeather: async (location, date) => {
     try {
-      // This is a simplified example. In a real-world scenario, you'd need to implement geocoding.
       const [lat, lon] = await getCoordinates(location);
-      const response = await axios.get(WEATHER_API_URL, {
+      const response = await axios.get('https://api.open-meteo.com/v1/forecast', {
         params: {
           latitude: lat,
           longitude: lon,
@@ -82,15 +94,13 @@ const api = {
   },
 };
 
-// Helper functions
 async function getCoordinates(location) {
-  // This is a placeholder. You should implement actual geocoding here.
-  // For now, we'll return fixed coordinates for demonstration purposes.
-  return [52.52, 13.41]; // Berlin coordinates
+  // Coordenadas fijas para este ejemplo, puedes reemplazarlas por geocodificación real
+  return [52.52, 13.41]; // Coordenadas de Berlín
 }
 
 function getWeatherCondition(code) {
-  // This is a simplified weather code interpretation
+  // Interpretación simplificada de los códigos meteorológicos
   if (code < 3) return 'Clear';
   if (code < 50) return 'Cloudy';
   if (code < 70) return 'Rainy';

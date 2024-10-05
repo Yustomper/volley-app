@@ -10,7 +10,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-lg p-6 max-w-sm w-full`}>
         <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-pink-600'}`}>{title}</h2>
-        <p className="mb-6">{message}</p>
+        <p className="mb-6">{message || '¿Estás seguro de que deseas eliminar?'}</p> {/* Mensaje predeterminado */}
         <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}

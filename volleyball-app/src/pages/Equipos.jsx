@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { PlusIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { PlusIcon, PencilIcon, TrashIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import AddTeamModal from '../components/AddTeamModal';
 import ConfirmModal from '../components/ConfirmModal';
 import api from '../services/api';
@@ -18,6 +18,7 @@ export default function Equipos() {
   const [search, setSearch] = useState('');
   const [orderBy, setOrderBy] = useState('name');
   const [pagination, setPagination] = useState({ page: 1, pageSize: 6, total: 0 });
+  const [sortOrder, setSortOrder] = useState('asc');
 
   useEffect(() => {
     fetchTeams();
@@ -29,7 +30,7 @@ export default function Equipos() {
       const response = await api.getTeams({
         page: pagination.page,
         search,
-        ordering: orderBy,
+        ordering: `${orderBy}_${sortOrder}`,
       });
       setTeams(response.data.results);
       setPagination(prev => ({ ...prev, total: response.data.count }));
@@ -110,14 +111,16 @@ export default function Equipos() {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
-  const handleOrderBy = (field) => {
-    setOrderBy(field);
+  const handleOrderBy = () => {
+    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
+
+  const totalPages = Math.ceil(pagination.total / pagination.pageSize);
 
   const renderTeamsList = () => {
     if (loading) {
@@ -126,7 +129,7 @@ export default function Equipos() {
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {Array.isArray(teams) && teams.length > 0 ? (
+        {teams.length > 0 ? (
           teams.map((team) => (
             <div key={team.id} className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>{team.name}</h3>
@@ -137,10 +140,10 @@ export default function Equipos() {
                       <img
                         src={player.avatar_url || '/api/placeholder/40/40'}
                         alt={player.name}
-                        className="w-10 h-10 rounded-full border-2 border-orange-500" // Cambiado a color naranja
+                        className="w-10 h-10 rounded-full border-2 border-orange-500"
                       />
                       <span className={isDarkMode ? 'text-gray-200' : 'text-gray-800'}>{player.name}</span>
-                      <span className={isDarkMode ? 'text-purple-400' : 'text-orange-500'}>#{player.jersey_number}</span> {/* Cambiado a color naranja */}
+                      <span className={isDarkMode ? 'text-purple-400' : 'text-orange-500'}>#{player.jersey_number}</span>
                     </div>
                     <button
                       onClick={() => handleRemovePlayer(team.id, player.id)}
@@ -178,10 +181,13 @@ export default function Equipos() {
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Gestión de Equipos</h1> {/* Cambiado a color naranja */}
+          <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Gestión de Equipos</h1>
           <button
-            onClick={() => setIsModalOpen(true)}
-            className={`${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'} text-white px-6 py-3 rounded-full transition duration-300 flex items-center`} // Cambiado a color naranja
+            onClick={() => {
+              setEditingTeam(null);
+              setIsModalOpen(true);
+            }}
+            className={`${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'} text-white px-6 py-3 rounded-full transition duration-300 flex items-center`}
           >
             <PlusIcon className="w-5 h-5 mr-2" />
             Crear Equipo
@@ -192,38 +198,63 @@ export default function Equipos() {
           <input
             type="text"
             placeholder="Buscar equipos..."
-            className="p-2 border rounded w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-orange-500" // Cambiado a color naranja
+            className={`p-2 border rounded w-full md:w-96 focus:outline-none focus:ring-2 focus:ring-orange-500
+              ${isDarkMode ? 'bg-gray-700 text-white placeholder-gray-400' : 'bg-white text-black placeholder-gray-500'}`}
             value={search}
             onChange={handleSearch}
-            style={{ color: 'black' }}
           />
-          <select 
-            value={orderBy} 
-            onChange={(e) => handleOrderBy(e.target.value)} 
-            className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500" // Cambiado a color naranja
+          <button 
+            onClick={handleOrderBy}
+            className={`${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'} 
+              px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-orange-500`}
           >
-            <option value="name">Ordenar por Nombre</option>
-            <option value="created_at">Ordenar por Fecha de Creación</option>
-          </select>
+            Ordenar: {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+          </button>
         </div>
 
         {renderTeamsList()}
 
+        {/* Paginación */}
+        <div className="mt-8 flex justify-center items-center space-x-4">
+          <button
+            onClick={() => handlePageChange(pagination.page - 1)}
+            disabled={pagination.page === 1}
+            className={`${pagination.page === 1 ? 'opacity-50 cursor-not-allowed' : ''} 
+              ${isDarkMode ? 'text-white' : 'text-black'}`}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          
+          <span className={isDarkMode ? 'text-white' : 'text-black'}>
+            Página {pagination.page} de {totalPages}
+          </span>
+          
+          <button
+            onClick={() => handlePageChange(pagination.page + 1)}
+            disabled={pagination.page >= totalPages}
+            className={`${pagination.page >= totalPages ? 'opacity-50 cursor-not-allowed' : ''} 
+              ${isDarkMode ? 'text-white' : 'text-black'}`}
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
         {/* Modal para agregar/editar equipos */}
-        {isModalOpen && (
-          <AddTeamModal 
-            team={editingTeam} 
-            onAdd={handleAddTeam} 
-            onUpdate={handleUpdateTeam} 
-            onClose={() => setIsModalOpen(false)} 
-          />
-        )}
+        <AddTeamModal
+          open={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingTeam(null);
+          }}
+          onSubmit={editingTeam ? handleUpdateTeam : handleAddTeam}
+          editingTeam={editingTeam}
+        />
 
         {/* Modal de confirmación */}
         <ConfirmModal 
-          isOpen={confirmModal.isOpen} 
-          onClose={() => setConfirmModal({ isOpen: false, type: '', id: null })} 
-          onConfirm={handleConfirmRemove} 
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal({ isOpen: false, type: '', id: null })}
+          onConfirm={handleConfirmRemove}
           title={confirmModal.type === 'team' ? 'Eliminar Equipo' : 'Eliminar Jugador'}
           message={confirmModal.type === 'team' ? '¿Estás seguro de que deseas eliminar este equipo?' : '¿Estás seguro de que deseas eliminar este jugador del equipo?'}
         />

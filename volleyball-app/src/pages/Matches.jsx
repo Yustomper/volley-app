@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { SearchIcon, FilterIcon, PlusIcon } from 'lucide-react';
+import { SearchIcon, PlusIcon } from 'lucide-react';
 import api from '../services/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,13 +11,12 @@ const Matches = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [orderBy, setOrderBy] = useState('date');
-  const [filterFinished, setFilterFinished] = useState('all');
+  const [sortOrder, setSortOrder] = useState('asc'); // Predeterminado a ascendente (De la A a la Z)
   const [pagination, setPagination] = useState({ page: 1, pageSize: 6, total: 0 });
 
   useEffect(() => {
     fetchMatches();
-  }, [search, orderBy, filterFinished, pagination.page]);
+  }, [search, sortOrder, pagination.page]);
 
   const fetchMatches = async () => {
     try {
@@ -25,14 +24,13 @@ const Matches = () => {
       const params = {
         page: pagination.page,
         search,
-        ordering: orderBy,
-        ...(filterFinished !== 'all' && { is_finished: filterFinished === 'finished' })
+        ordering: `${sortOrder === 'asc' ? '' : '-'}home_team__name`, // Ordenamos por el nombre del equipo local
       };
       const response = await api.getMatches(params);
       setMatches(response.data.results);
       setPagination(prev => ({ ...prev, total: response.data.count }));
     } catch (error) {
-      console.error('Error fetching matches:', error);
+      console.error('Error al cargar los partidos:', error);
       toast.error('Error al cargar los partidos');
     } finally {
       setLoading(false);
@@ -44,13 +42,8 @@ const Matches = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
-  const handleOrderBy = (field) => {
-    setOrderBy(field);
-    setPagination(prev => ({ ...prev, page: 1 }));
-  };
-
-  const handleFilterChange = (value) => {
-    setFilterFinished(value);
+  const handleSortOrderChange = () => {
+    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
@@ -127,31 +120,17 @@ const Matches = () => {
               className="pl-10 p-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-orange-500"
               value={search}
               onChange={handleSearch}
-              style={{ color: 'black' }}
+              style={{ color: isDarkMode ? 'white' : 'black' }}
             />
           </div>
-          <div className="flex gap-4 w-full md:w-auto">
-            <select 
-              value={orderBy} 
-              onChange={(e) => handleOrderBy(e.target.value)} 
-              className="p-2 border rounded w-full md:w-auto"
-              style={{ color: 'black' }}
-            >
-              <option value="date">Ordenar por fecha</option>
-              <option value="-date">Ordenar por fecha (desc)</option>
-              <option value="created_at">Ordenar por creación</option>
-            </select>
-            <select 
-              value={filterFinished} 
-              onChange={(e) => handleFilterChange(e.target.value)} 
-              className="p-2 border rounded w-full md:w-auto"
-              style={{ color: 'black' }}
-            >
-              <option value="all">Todos los partidos</option>
-              <option value="finished">Finalizados</option>
-              <option value="in_progress">En progreso</option>
-            </select>
-          </div>
+          <button 
+            onClick={handleSortOrderChange}
+            className={`p-2 border rounded flex items-center justify-center ${
+              isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
+            }`}
+          >
+            {sortOrder === 'asc' ? 'De la A a la Z' : 'De la Z a la A'}
+          </button>
         </div>
 
         {renderMatchesList()}

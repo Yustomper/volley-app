@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiDayThunderstorm, WiDayFog } from 'react-icons/wi';
+import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiDayThunderstorm } from 'react-icons/wi';
 import api from '../services/api';
 import { weatherService } from '../services/weatherService';
 
@@ -10,7 +10,9 @@ const MatchDetails = () => {
   const { matchId } = useParams();
   const [match, setMatch] = useState(null);
   const [weather, setWeather] = useState(null);
+  const [weatherError, setWeatherError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchMatchDetails();
@@ -18,140 +20,118 @@ const MatchDetails = () => {
 
   const fetchMatchDetails = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      setWeatherError(null);
+      
       const response = await api.getMatch(matchId);
       setMatch(response.data);
+      
+      console.log('Match data:', response.data);
+
       if (response.data.latitude && response.data.longitude) {
-        const weatherData = await weatherService.getWeather(
-          response.data.latitude,
-          response.data.longitude,
-          response.data.date
-        );
-        if (weatherData) {
-          setWeather({
-            temperature: weatherData.temperature,
-            ...getWeatherCondition(weatherData.weatherCode)
-          });
+        try {
+          const matchDate = new Date(response.data.date);
+          const currentDate = new Date();
+          let dateToUse;
+
+          if (matchDate > currentDate) {
+            // If the match is in the future, use the current date for weather
+            dateToUse = currentDate;
+          } else {
+            // If the match is in the past, use the match date
+            dateToUse = matchDate;
+          }
+
+          const weatherData = await weatherService.getWeather(
+            response.data.latitude,
+            response.data.longitude,
+            dateToUse.toISOString()
+          );
+          setWeather(weatherData);
+        } catch (weatherErr) {
+          console.error('Error del clima:', weatherErr);
+          setWeatherError(weatherErr.message);
         }
+      } else {
+        setWeatherError('No hay coordenadas disponibles para este partido');
       }
     } catch (error) {
-      console.error('Error fetching match details:', error);
+      console.error('Error al cargar el partido:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getWeatherCondition = (code) => {
-    if (code === 0) return { text: 'Despejado', icon: <WiDaySunny className="inline-block text-4xl" /> };
-    if (code === 1 || code === 2 || code === 3) return { text: 'Parcialmente nublado', icon: <WiCloudy className="inline-block text-4xl" /> };
-    if (code >= 51 && code <= 67) return { text: 'Lluvia', icon: <WiRain className="inline-block text-4xl" /> };
-    if (code >= 71 && code <= 77) return { text: 'Nieve', icon: <WiSnow className="inline-block text-4xl" /> };
-    if (code >= 95 && code <= 99) return { text: 'Tormenta', icon: <WiDayThunderstorm className="inline-block text-4xl" /> };
-    return { text: 'Niebla', icon: <WiDayFog className="inline-block text-4xl" /> };
+  const getWeatherInfo = (weatherCode) => {
+    const weatherInfo = {
+      Clear: { icon: <WiDaySunny className="text-4xl" />, text: 'Despejado' },
+      Cloudy: { icon: <WiCloudy className="text-4xl" />, text: 'Nublado' },
+      Rainy: { icon: <WiRain className="text-4xl" />, text: 'Lluvia' },
+      Snowy: { icon: <WiSnow className="text-4xl" />, text: 'Nieve' },
+      Stormy: { icon: <WiDayThunderstorm className="text-4xl" />, text: 'Tormenta' }
+    };
+    return weatherInfo[weatherCode] || weatherInfo.Clear;
   };
 
   if (loading) {
-    return (
-      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
-            <div className="h-32 bg-gray-300 rounded mb-4"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <div>Cargando...</div>;
   }
 
-  if (!match) {
-    return (
-      <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-        <div className="container mx-auto px-4 py-8">
-          <p>No se encontró el partido.</p>
-        </div>
-      </div>
-    );
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
-        <div className={`bg-${isDarkMode ? 'gray-800' : 'gray-100'} p-6 rounded-lg shadow-lg mb-8`}>
-          <div className="flex justify-between items-center mb-4">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold">{match.home_team.name}</h2>
+        {match && (
+          <div className={`bg-${isDarkMode ? 'gray-800' : 'gray-100'} p-6 rounded-lg shadow-lg`}>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Datos del partido:</h3>
+              <pre className="text-sm overflow-x-auto">
+                {JSON.stringify({
+                  location: match.location,
+                  latitude: match.latitude,
+                  longitude: match.longitude,
+                  date: match.date
+                }, null, 2)}
+              </pre>
             </div>
-            <div className="text-center">
-              <h1 className={`text-6xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
-                {match.home_team_score || 0} : {match.away_team_score || 0}
-              </h1>
-              <p className="text-lg mt-2">
-                {new Date(match.date).toLocaleDateString()} - {match.location}
-              </p>
-              {weather && (
-                <div className="flex items-center justify-center mt-1">
-                  {weather.icon}
-                  <span className="ml-2">{weather.temperature}°C, {weather.text}</span>
-                </div>
-              )}
-            </div>
-            <div className="text-center">
-              <h2 className="text-4xl font-bold">{match.away_team.name}</h2>
-            </div>
-          </div>
-          
-          {/* Detalles de los sets */}
-          <div className="grid grid-cols-3 gap-4 text-center mb-8">
-            {match.sets.map((set) => (
-              <div key={set.id} className={`p-2 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                <p className="font-semibold">Set {set.set_number}</p>
-                <p>{set.home_team_score} - {set.away_team_score}</p>
+            
+            <div className="flex justify-between items-center">
+              <div className="text-center w-1/3">
+                <h2 className="text-3xl font-bold">{match.home_team.name}</h2>
               </div>
-            ))}
-          </div>
-
-          {/* Estadísticas de jugadores */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Equipo Local */}
-            <div>
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
-                {match.home_team.name} - Estadísticas
-              </h3>
-              {match.player_performances
-                .filter(perf => match.home_team.players.some(p => p.id === perf.player))
-                .map(performance => (
-                  <div key={performance.id} className={`mb-2 p-2 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                    <p className="font-semibold">{performance.player_name}</p>
-                    <p>
-                      Puntos: {performance.points}, 
-                      Bloqueos: {performance.blocks}, 
-                      Aces: {performance.aces},
-                      Recepciones: {performance.digs}
-                    </p>
+              <div className="text-center w-1/3">
+                <div className={`text-5xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'} mb-2`}>
+                  VS
+                </div>
+                <p className="text-lg">
+                  {new Date(match.date).toLocaleString()}
+                </p>
+                <p className="text-lg mb-2">{match.location}</p>
+                
+                {weather ? (
+                  <div className="flex items-center justify-center">
+                    {getWeatherInfo(weather.weatherCode).icon}
+                    <span className="ml-2">
+                      {weather.temperature}°C - {getWeatherInfo(weather.weatherCode).text}
+                    </span>
                   </div>
-                ))}
-            </div>
-
-            {/* Equipo Visitante */}
-            <div>
-              <h3 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
-                {match.away_team.name} - Estadísticas
-              </h3>
-              {match.player_performances
-                .filter(perf => match.away_team.players.some(p => p.id === perf.player))
-                .map(performance => (
-                  <div key={performance.id} className={`mb-2 p-2 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                    <p className="font-semibold">{performance.player_name}</p>
-                    <p>
-                      Puntos: {performance.points}, 
-                      Bloqueos: {performance.blocks}, 
-                      Aces: {performance.aces},
-                      Recepciones: {performance.digs}
-                    </p>
+                ) : (
+                  <div className="text-red-500">
+                    {weatherError || 'No se pudo cargar el clima'}
                   </div>
-                ))}
+                )}
+              </div>
+              <div className="text-center w-1/3">
+                <h2 className="text-3xl font-bold">{match.away_team.name}</h2>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

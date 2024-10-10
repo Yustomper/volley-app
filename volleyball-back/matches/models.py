@@ -1,7 +1,6 @@
 from django.db import models
 from teams.models import Team, Player
 
-# matches/models.py
 class Match(models.Model):
     home_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='home_matches')
     away_team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='away_matches')
@@ -10,6 +9,8 @@ class Match(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_finished = models.BooleanField(default=False)
+    start_time = models.DateTimeField(null=True, blank=True)
+    duration = models.DurationField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.date}"

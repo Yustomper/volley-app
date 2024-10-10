@@ -52,15 +52,18 @@ const api = {
   deletePlayer: (playerId) =>
     createAxiosInstance().delete(`/api/teams/players/${playerId}/`),
 
-  // Matches
-  getMatches: (params) =>
-    createAxiosInstance().get("/api/matches/", { params }),
-  getMatch: (id) => createAxiosInstance().get(`/api/matches/${id}/`),
-  createMatch: (matchData) =>
-    createAxiosInstance().post("/api/matches/", matchData),
-  updateMatch: (id, matchData) =>
-    createAxiosInstance().put(`/api/matches/${id}/`, matchData),
-  deleteMatch: (id) => createAxiosInstance().delete(`/api/matches/${id}/`),
+ // Matches
+ getMatches: (params) => createAxiosInstance().get("/api/matches/", { params }),
+ getMatch: (id) => createAxiosInstance().get(`/api/matches/${id}/`),
+ createMatch: (matchData) => createAxiosInstance().post("/api/matches/", matchData),
+ updateMatch: (id, matchData) => createAxiosInstance().put(`/api/matches/${id}/`, matchData),
+ deleteMatch: (id) => createAxiosInstance().delete(`/api/matches/${id}/`),
+
+ // Nuevos métodos para el partido de voleibol
+ startMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/start_match/`),
+ endMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/end_match/`),
+ updateMatchScore: (matchId, data) => createAxiosInstance().post(`/api/matches/${matchId}/update_score/`, data),
+ updatePlayerPerformance: (matchId, data) => createAxiosInstance().post(`/api/matches/${matchId}/update_player_performance/`, data),
 
   // Sets
   createSet: (setData) =>

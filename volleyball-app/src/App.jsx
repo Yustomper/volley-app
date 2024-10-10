@@ -17,6 +17,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MatchDetails from './pages/MatchDetails';
 import NotFound from './components/NotFound';
+import VolleyballMatch from './components/VolleyballMatch';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/match-details/:matchId" element={<MatchDetails />} />
+                <Route path="/volleyball/:matchId" element={<VolleyballMatch />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

@@ -15,7 +15,6 @@ class PlayerPerformanceSerializer(serializers.ModelSerializer):
         model = PlayerPerformance
         fields = ['id', 'player', 'player_name', 'points', 'blocks', 'aces', 'digs']
 
-
 class MatchSerializer(serializers.ModelSerializer):
     home_team = TeamSerializer(read_only=True)
     away_team = TeamSerializer(read_only=True)
@@ -23,8 +22,11 @@ class MatchSerializer(serializers.ModelSerializer):
     away_team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), source='away_team', write_only=True)
     sets = SetSerializer(many=True, read_only=True)
     player_performances = PlayerPerformanceSerializer(many=True, read_only=True)
+    start_time = serializers.DateTimeField(read_only=True)
+    duration = serializers.DurationField(read_only=True)
 
     class Meta:
         model = Match
         fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 
-                 'location', 'latitude', 'longitude', 'is_finished', 'sets', 'player_performances']
+                  'location', 'latitude', 'longitude', 'is_finished', 'sets', 
+                  'player_performances', 'start_time', 'duration']

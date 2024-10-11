@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Statistics
 from teams.models import Team
-from matches.models import Match, PlayerPerformance, Set
-from django.db.models import Sum, Count, Q, F
+from matches.models import Match, PlayerPerformance, Set,PointEvent
+from django.db.models import Sum, Count, Q, F,Max
 
 class StatisticsView(APIView):
     def get(self, request):
@@ -60,3 +60,60 @@ class StatisticsView(APIView):
                 'wins': stats.most_wins_count
             }
         }, status=status.HTTP_200_OK)
+
+
+class MatchStatisticsView(APIView):
+    def get(self, request, match_id):
+        try:
+            match = Match.objects.get(id=match_id)
+            
+            # Obtener el mejor anotador del partido
+            best_scorer = PlayerPerformance.objects.filter(match=match).annotate(
+                total_points=Sum(F('spike_points') + F('block_points') + F('aces'))
+            ).order_by('-total_points').first()
+            
+            # Obtener el mejor sacador del partido
+            best_server = PlayerPerformance.objects.filter(match=match).order_by('-aces').first()
+            
+            # Obtener estadísticas por set
+            sets = Set.objects.filter(match=match).values('set_number', 'home_team_score', 'away_team_score')
+            
+            response_data = {
+                'sets': list(sets),
+                'best_scorer': None,
+                'best_server': None
+            }
+            
+            if best_scorer:
+                best_scorer_points_per_set = PlayerPerformance.objects.filter(
+                    match=match, player=best_scorer.player
+                ).values('set__set_number').annotate(
+                    points=Sum(F('spike_points') + F('block_points') + F('aces'))
+                )
+                
+                response_data['best_scorer'] = {
+                    'name': best_scorer.player.name,
+                    'jersey_number': best_scorer.player.jersey_number,
+                    'position': best_scorer.player.position,
+                    'total_points': best_scorer.total_points,
+                    'spike_attempts': best_scorer.spike_points,
+                    'points_per_set': list(best_scorer_points_per_set)
+                }
+            
+            if best_server:
+                best_server_points_per_set = PlayerPerformance.objects.filter(
+                    match=match, player=best_server.player
+                ).values('set__set_number').annotate(points=Sum('aces'))
+                
+                response_data['best_server'] = {
+                    'name': best_server.player.name,
+                    'jersey_number': best_server.player.jersey_number,
+                    'position': best_server.player.position,
+                    'total_aces': best_server.aces,
+                    'points_per_set': list(best_server_points_per_set)
+                }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Match.DoesNotExist:
+            return Response({'error': 'Partido no encontrado'}, status=status.HTTP_404_NOT_FOUND)

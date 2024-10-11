@@ -11,12 +11,19 @@ class Team(models.Model):
 
 
 class Player(models.Model):
+    POSITION_CHOICES = [
+        ('CE', 'Central'),
+        ('PR', 'Punta Receptor'),
+        ('AR', 'Armador'),
+        ('OP', 'Opuesto'),
+        ('LI', 'Líbero'),
+    ]
     team = models.ForeignKey(
         Team, related_name='players', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     jersey_number = models.IntegerField()
     avatar_url = models.URLField(blank=True, null=True)
-
+    position = models.CharField(max_length=2, choices=POSITION_CHOICES, null=True, blank=True)
     DEFAULT_AVATAR_URL = "https://cdn.icon-icons.com/icons2/2643/PNG/512/female_woman_person_people_avatar_icon_159366.png"
 
     def save(self, *args, **kwargs):

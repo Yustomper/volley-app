@@ -75,6 +75,7 @@ const api = {
     createAxiosInstance().put(`/api/matches/sets/${id}/`, setData),
 
   // Estadísticas
+  getMatchStatistics: (matchId) => createAxiosInstance().get(`/api/statistics/match/${matchId}/`),
   getStatistics: () => axios.get(`${API_URL}/api/statistics/`),
 
   // Búsqueda de ubicaciones con geocodificación

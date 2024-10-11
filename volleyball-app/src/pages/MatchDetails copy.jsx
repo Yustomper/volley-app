@@ -163,7 +163,7 @@ const MatchDetails = () => {
 
   // Nuevo manejador para el botón de iniciar partido
   const handleStartMatch = () => {
-    navigate(`/start-match/${matchId}`);
+    navigate(`/volleyball/${matchId}`); // Redirige a la ruta deseada
   };
 
   if (state.loading) {

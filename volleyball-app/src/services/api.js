@@ -17,10 +17,10 @@ const api = {
   // Autenticación
   login: (credentials) => axios.post(`${API_URL}/api/auth/login/`, credentials),
   register: (userData) => axios.post(`${API_URL}/api/auth/register/`, userData),
-  logout: () => createAxiosInstance().post(`${API_URL}/api/auth/logout/`),
+  logout: () => createAxiosInstance().post(`/api/auth/logout/`),
 
   // Usuario
-  getCurrentUser: () => createAxiosInstance().get(`${API_URL}/api/auth/user/`),
+  getCurrentUser: () => createAxiosInstance().get(`/api/auth/user/`),
 
   // Equipos con paginación, búsqueda y ordenamiento
   getTeams: ({ page = 1, search = "", ordering = "name" } = {}) =>
@@ -52,36 +52,27 @@ const api = {
   deletePlayer: (playerId) =>
     createAxiosInstance().delete(`/api/teams/players/${playerId}/`),
 
- // Matches
- getMatches: (params) => createAxiosInstance().get("/api/matches/", { params }),
- getMatch: (id) => createAxiosInstance().get(`/api/matches/${id}/`),
- createMatch: (matchData) => createAxiosInstance().post("/api/matches/", matchData),
- updateMatch: (id, matchData) => createAxiosInstance().put(`/api/matches/${id}/`, matchData),
- deleteMatch: (id) => createAxiosInstance().delete(`/api/matches/${id}/`),
+  // Matches
+  getMatches: (params) => createAxiosInstance().get("/api/matches/", { params }),
+  getMatch: (id) => createAxiosInstance().get(`/api/matches/${id}/`),
+  createMatch: (matchData) => createAxiosInstance().post("/api/matches/", matchData),
+  updateMatch: (id, matchData) => createAxiosInstance().put(`/api/matches/${id}/`, matchData),
+  deleteMatch: (id) => createAxiosInstance().delete(`/api/matches/${id}/`),
 
- // Nuevos métodos para el partido de voleibol
- startMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/start_match/`),
- endMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/end_match/`),
- updateMatchScore: (matchId, data) => createAxiosInstance().post(`/api/matches/${matchId}/update_score/`, data),
- updatePlayerPerformance: (matchId, data) => createAxiosInstance().post(`/api/matches/${matchId}/update_player_performance/`, data),
+  // Nuevos métodos para el partido de voleibol
+  startMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/start_match/`),
+  endMatch: (matchId) => createAxiosInstance().post(`/api/matches/${matchId}/end_match/`),
+  updateMatchScore: (matchId, data) => createAxiosInstance().post(`/api/matches/${matchId}/update_score/`, data),
+
+  // Corregido aquí el método de performance para evitar dobles // en las rutas
+  updatePlayerPerformance: (performanceId, data) =>
+    createAxiosInstance().put(`/api/matches/performances/${performanceId}/`, data),
 
   // Sets
   createSet: (setData) =>
-    createAxiosInstance().post(`${API_URL}/api/matches/sets/`, setData),
+    createAxiosInstance().post(`/api/matches/sets/`, setData),
   updateSet: (id, setData) =>
-    createAxiosInstance().put(`${API_URL}/api/matches/sets/${id}/`, setData),
-
-  // Rendimiento del jugador
-  createPlayerPerformance: (performanceData) =>
-    createAxiosInstance().post(
-      `${API_URL}/api/matches/performances/`,
-      performanceData
-    ),
-  updatePlayerPerformance: (id, performanceData) =>
-    createAxiosInstance().put(
-      `${API_URL}/api/matches/performances/${id}/`,
-      performanceData
-    ),
+    createAxiosInstance().put(`/api/matches/sets/${id}/`, setData),
 
   // Estadísticas
   getStatistics: () => axios.get(`${API_URL}/api/statistics/`),

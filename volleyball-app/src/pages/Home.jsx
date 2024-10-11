@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 
+
 const Home = () => {
   const { isDarkMode } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -17,8 +18,23 @@ const Home = () => {
     const timer = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length);
     }, 5000);
-
     return () => clearInterval(timer);
+  }, []);
+  
+  useEffect(() => {
+    const wakeUpBackend = async () => {
+      try {
+        // URL directa al backend
+        await fetch(import.meta.env.VITE_BACKEND_API, {
+          method: 'GET'
+        });
+        console.log('Petición al backend enviada para despertarlo.');
+      } catch (error) {
+        console.error('Error despertando el backend:', error);
+      }
+    };
+
+    wakeUpBackend();
   }, []);
 
   return (

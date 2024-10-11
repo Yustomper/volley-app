@@ -148,7 +148,7 @@ const VolleyballMatch = () => {
     const confirmed = window.confirm('¿Estás seguro de que deseas finalizar el partido?');
     if (confirmed) {
       try {
-        await  api.endMatch(matchId);
+        await api.endMatch(matchId);
         if (timerRef.current) {
           clearInterval(timerRef.current);
         }
@@ -172,15 +172,17 @@ const VolleyballMatch = () => {
     if (isMatchStarted) {
       await incrementScore(team);
       
-      // Update player performance
       const playerName = team === 'home' ? homePositions[position - 1] : awayPositions[position - 1];
-      try {
-        await api.updatePlayerPerformance(matchId, {
-          player_id: playerName, // Assuming player name is used as ID for simplicity
-          points: 1
-        });
-      } catch (error) {
-        console.error('Error updating player performance:', error);
+      const player = match?.player_performances?.find(p => p.player_name === playerName);
+
+      if (player) {
+        try {
+          await api.updatePlayerPerformance(player.id, {
+            points: 1
+          });
+        } catch (error) {
+          console.error('Error updating player performance:', error);
+        }
       }
     }
   };

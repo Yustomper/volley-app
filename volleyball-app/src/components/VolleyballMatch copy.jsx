@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { FaPlus, FaMinus, FaPlay, FaStop } from 'react-icons/fa';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
-import PointTypeModal from './PointTypeModal'; // Asegúrate de tener el componente modal
+import PointTypeModal from './PointTypeModal';
 
-const VolleyballMatch = () => {
+export default function VolleyballMatch() {
   const { isDarkMode } = useTheme();
   const { matchId } = useParams();
   const [match, setMatch] = useState(null);
@@ -18,9 +18,9 @@ const VolleyballMatch = () => {
   const [awayPositions, setAwayPositions] = useState(Array(6).fill(''));
   const [isMatchStarted, setIsMatchStarted] = useState(false);
   const [matchDuration, setMatchDuration] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Control del modal
-  const [selectedTeam, setSelectedTeam] = useState(null); // Equipo seleccionado
-  const [selectedPosition, setSelectedPosition] = useState(null); // Posición seleccionada
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [selectedPosition, setSelectedPosition] = useState(null);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -80,13 +80,13 @@ const VolleyballMatch = () => {
     } else {
       setAwayScore(newScore);
     }
-
+    
     try {
       await api.updateMatchScore(matchId, {
         set_number: currentSet,
         home_score: team === 'home' ? newScore : homeScore,
         away_score: team === 'away' ? newScore : awayScore,
-        point_type: pointType // Enviar el tipo de punto al backend
+        point_type: pointType
       });
     } catch (error) {
       console.error('Error updating score:', error);
@@ -100,7 +100,7 @@ const VolleyballMatch = () => {
     } else {
       setAwayScore(newScore);
     }
-
+    
     try {
       await api.updateMatchScore(matchId, {
         set_number: currentSet,
@@ -118,7 +118,7 @@ const VolleyballMatch = () => {
     setCurrentSet(currentSet + 1);
     setHomeScore(0);
     setAwayScore(0);
-
+    
     try {
       await api.updateMatchScore(matchId, {
         set_number: currentSet + 1,
@@ -135,7 +135,7 @@ const VolleyballMatch = () => {
       alert('Por favor, asigna todas las posiciones antes de iniciar el partido.');
       return;
     }
-
+    
     try {
       const response = await api.startMatch(matchId);
       if (response.data.start_time) {
@@ -177,13 +177,13 @@ const VolleyballMatch = () => {
     if (isMatchStarted) {
       setSelectedTeam(team);
       setSelectedPosition(position);
-      setIsModalOpen(true); // Abre el modal para seleccionar tipo de punto
+      setIsModalOpen(true);
     }
   };
 
   const handlePointTypeSelect = async (pointType) => {
     await incrementScore(selectedTeam, pointType);
-
+    
     const positions = selectedTeam === 'home' ? homePositions : awayPositions;
     const playerName = positions[selectedPosition - 1];
     const player = match?.player_performances?.find(p => p.player_name === playerName);
@@ -198,7 +198,7 @@ const VolleyballMatch = () => {
       }
     }
 
-    setIsModalOpen(false); // Cierra el modal
+    setIsModalOpen(false);
   };
 
   const renderCourt = (team) => {
@@ -318,7 +318,6 @@ const VolleyballMatch = () => {
         </div>
       </div>
 
-      {/* Modal para seleccionar tipo de punto */}
       <PointTypeModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -326,6 +325,4 @@ const VolleyballMatch = () => {
       />
     </div>
   );
-};
-
-export default VolleyballMatch;
+}

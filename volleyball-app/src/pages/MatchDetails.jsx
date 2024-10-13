@@ -8,7 +8,7 @@ import {
   WiSnow,
   WiDayThunderstorm
 } from 'react-icons/wi';
-import { FaEdit, FaTrash, FaSave, FaTimes, FaPlay } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaVolleyballBall, FaTrophy } from 'react-icons/fa';
 import api from '../services/api';
 
 const MatchDetails = () => {
@@ -175,74 +175,115 @@ const MatchDetails = () => {
     navigate(`/volleyball/${matchId}`);
   };
 
-  const renderStatistics = () => {
-    if (!state.statistics) return null;
+  const StatisticCard = ({ title, icon, children, isEmpty }) => (
+    <div className={`mb-8 p-6 rounded-lg shadow-lg ${isEmpty ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'}`}>
+      <div className="flex items-center mb-4">
+        {icon}
+        <h3 className="text-xl font-semibold ml-2">{title}</h3>
+      </div>
+      {children}
+    </div>
+  );
 
-    const { best_scorer, best_server, sets } = state.statistics;
+  const renderPlayerStats = (player, title, icon) => {
+    if (!player) {
+      return (
+        <StatisticCard title={title} icon={icon} isEmpty={true}>
+          <p className="text-gray-500">No hay datos disponibles</p>
+        </StatisticCard>
+      );
+    }
 
     return (
-      <div className="mt-8 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Estadísticas del Partido</h2>
-        
-        {best_scorer && (
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Mejor Anotador</h3>
-            <p>Nombre: {best_scorer.name}</p>
-            <p>Número: {best_scorer.jersey_number}</p>
-            <p>Posición: {best_scorer.position}</p>
-            <p>Total de puntos: {best_scorer.total_points}</p>
-            <p>Ataques realizados: {best_scorer.spike_attempts}</p>
-            {best_scorer.points_per_set && best_scorer.points_per_set.length > 0 && (
-              <>
-                <h4 className="font-semibold mt-2">Puntos por set:</h4>
-                <ul>
-                  {best_scorer.points_per_set.map((set, index) => (
-                    <li key={index}>Set {set.set__set_number}: {set.points} puntos</li>
-                  ))}
-                </ul>
-              </>
-            )}
+      <StatisticCard title={title} icon={icon}>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p className="font-semibold">Nombre:</p>
+            <p>{player.name}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Número de camiseta:</p>
+            <p>{player.jersey_number}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Posición:</p>
+            <p>{player.position}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Total de puntos:</p>
+            <p>{player.total_points}</p>
+          </div>
+        </div>
+        {title === "Mejor Anotador" && (
+          <div>
+            <p className="font-semibold">Ataques realizados:</p>
+            <p>{player.spike_attempts}</p>
           </div>
         )}
-
-        {best_server && (
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">Mejor Sacador</h3>
-            <p>Nombre: {best_server.name}</p>
-            <p>Número: {best_server.jersey_number}</p>
-            <p>Posición: {best_server.position}</p>
-            <p>Total de aces: {best_server.total_aces}</p>
-            {best_server.points_per_set && best_server.points_per_set.length > 0 && (
-              <>
-                <h4 className="font-semibold mt-2">Puntos por set:</h4>
-                <ul>
-                  {best_server.points_per_set.map((set, index) => (
-                    <li key={index}>Set {set.set__set_number}: {set.points} puntos</li>
-                  ))}
-                </ul>
-              </>
-            )}
+        {title === "Mejor Sacador" && (
+          <div>
+            <p className="font-semibold">Total de aces:</p>
+            <p>{player.total_aces}</p>
           </div>
         )}
-
-        {sets && sets.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-4">Resultados por Set</h3>
-            {sets.map((set, index) => (
-              <div key={index} className="mb-6">
-                <h4 className="font-semibold mb-2">Set {set.set_number}</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h5 className="font-semibold mb-2">{state.match?.home_team.name}</h5>
-                    <p>Puntos: {set.home_team_score}</p>
-                  </div>
-                  <div>
-                    <h5 className="font-semibold mb-2">{state.match?.away_team.name}</h5>
-                    <p>Puntos: {set.away_team_score}</p>
-                  </div>
+        <div className="mt-4">
+          <p className="font-semibold mb-2">Puntos por Set:</p>
+          {player.points_per_set && player.points_per_set.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {player.points_per_set.map((set, index) => (
+                <div key={index} className="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                  <p className="font-medium">Set {set.set__set_number}</p>
+                  <p>{set.points} puntos</p>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No hay datos de sets disponibles</p>
+          )}
+        </div>
+      </StatisticCard>
+    );
+  };
+
+  const renderStatistics = () => {
+    const { statistics } = state;
+
+    return (
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {renderPlayerStats(
+          statistics?.best_scorer,
+          "Mejor Anotador",
+          <FaVolleyballBall className="text-2xl text-orange-500" />
+        )}
+        {renderPlayerStats(
+          statistics?.best_server,
+          "Mejor Sacador",
+          <FaTrophy className="text-2xl text-yellow-500" />
+        )}
+        {statistics?.sets && statistics.sets.length > 0 && (
+          <div className="md:col-span-2">
+            <StatisticCard 
+              title="Resultados por Set" 
+              icon={<FaVolleyballBall className="text-2xl text-blue-500" />}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {statistics.sets.map((set, index) => (
+                  <div key={index} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-3">Set {set.set_number}</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="font-medium">{state.match?.home_team.name}</p>
+                        <p className="text-lg">{set.home_team_score}</p>
+                      </div>
+                      <div>
+                        <p className="font-medium">{state.match?.away_team.name}</p>
+                        <p className="text-lg">{set.away_team_score}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </StatisticCard>
           </div>
         )}
       </div>
@@ -250,9 +291,11 @@ const MatchDetails = () => {
   };
 
   if (state.loading) {
-    return <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-white"></div>
-    </div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-white"></div>
+      </div>
+    );
   }
 
   if (state.error) {
@@ -300,7 +343,7 @@ const MatchDetails = () => {
                         onClick={handleStartMatch} 
                         className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition-colors"
                       >
-                        <FaPlay /> Iniciar Partido
+                        <FaPlay className="inline mr-1" /> Iniciar Partido
                       </button>
                     </>
                   )}
@@ -354,20 +397,16 @@ const MatchDetails = () => {
                       <p className="text-lg">
                         {new Date(state.match.date).toLocaleString()}
                       </p>
-                      <p className="text-lg mb-2">{state.match.location}</p>
+                      <p className="text-lg  mb-2">{state.match.location}</p>
                       
                       {state.weather ? (
                         <div className="flex items-center justify-center">
                           {getWeatherIcon(state.weather.condition)}
-                          <span className="ml-2">
-                            {state.weather.temperature}°C
-                          </span>
+                          <span className="ml-2">{state.weather.temperature}°C</span>
                         </div>
-                      ) : (
-                        <div className="text-red-500">
-                          {state.weatherError || 'No se pudo cargar el clima'}
-                        </div>
-                      )}
+                      ) : state.weatherError ? (
+                        <p className="text-red-500">{state.weatherError}</p>
+                      ) : null}
                     </div>
                     <div className="text-center w-1/3">
                       <h2 className="text-3xl font-bold">{state.match.away_team.name}</h2>

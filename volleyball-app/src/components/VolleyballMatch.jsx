@@ -28,12 +28,25 @@ const VolleyballMatch = () => {
       try {
         setLoading(true);
         const response = await api.getMatch(matchId);
-        
+  
         if (response && response.data) {
-          setMatch(response.data);
-          setIsMatchStarted(!!response.data.start_time);
-          if (response.data.start_time && !response.data.is_finished) {
-            const startTime = new Date(response.data.start_time);
+          const matchData = response.data;
+          setMatch(matchData);
+          console.log("Datos de match Fetch:", matchData);  // Verifica los datos de match y player_performances
+          setIsMatchStarted(!!matchData.start_time);
+  
+          // Asignar automáticamente los nombres de los jugadores a las posiciones
+          const homePlayerNames = matchData.home_team.players.map(player => player.name);
+          const awayPlayerNames = matchData.away_team.players.map(player => player.name);
+  
+          setHomePositions(homePlayerNames);
+          setAwayPositions(awayPlayerNames);
+  
+          console.log("Nombres de jugadores asignados a homePositions:", homePlayerNames);
+          console.log("Nombres de jugadores asignados a awayPositions:", awayPlayerNames);
+  
+          if (matchData.start_time && !matchData.is_finished) {
+            const startTime = new Date(matchData.start_time);
             const now = new Date();
             setMatchDuration(Math.floor((now - startTime) / 1000));
             startTimer();
@@ -47,15 +60,10 @@ const VolleyballMatch = () => {
         setLoading(false);
       }
     };
-
+  
     fetchMatchDetails();
-
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
   }, [matchId]);
+  
 
   const startTimer = () => {
     if (timerRef.current) {
@@ -81,13 +89,26 @@ const VolleyballMatch = () => {
       setAwayScore(newScore);
     }
 
+    console.log("Datos enviados al backend: ", {
+      set_number: currentSet,
+      home_score: team === 'home' ? newScore : homeScore,
+      away_score: team === 'away' ? newScore : awayScore,
+      point_type: pointType
+    });
     try {
       await api.updateMatchScore(matchId, {
         set_number: currentSet,
         home_score: team === 'home' ? newScore : homeScore,
         away_score: team === 'away' ? newScore : awayScore,
-        point_type: pointType // Enviar el tipo de punto al backend
+        point_type: pointType 
       });
+      console.log("Datos enviados al backend: ", {
+        set_number: currentSet,
+        home_score: team === 'home' ? newScore : homeScore,
+        away_score: team === 'away' ? newScore : awayScore,
+        point_type: pointType
+      });
+      
     } catch (error) {
       console.error('Error updating score:', error);
     }
@@ -100,6 +121,12 @@ const VolleyballMatch = () => {
     } else {
       setAwayScore(newScore);
     }
+
+    console.log("Datos enviados al backend en decremento:", {
+      set_number: currentSet,
+      home_score: team === 'home' ? newScore : homeScore,
+      away_score: team === 'away' ? newScore : awayScore
+    });
 
     try {
       await api.updateMatchScore(matchId, {
@@ -135,9 +162,14 @@ const VolleyballMatch = () => {
       alert('Por favor, asigna todas las posiciones antes de iniciar el partido.');
       return;
     }
-
+  
+    console.log("Posiciones del equipo local:", homePositions);
+    console.log("Posiciones del equipo visitante:", awayPositions);
+    console.log("matchId:", matchId);  // Verificar que el matchId sea correcto
+  
     try {
       const response = await api.startMatch(matchId);
+      console.log("Respuesta del backend al iniciar el partido:", response.data);
       if (response.data.start_time) {
         setIsMatchStarted(true);
         setMatchDuration(0);
@@ -148,6 +180,7 @@ const VolleyballMatch = () => {
       alert('Error al iniciar el partido. Por favor, intenta de nuevo.');
     }
   };
+  
 
   const handleEndMatch = async () => {
     const confirmed = window.confirm('¿Estás seguro de que deseas finalizar el partido?');
@@ -174,37 +207,56 @@ const VolleyballMatch = () => {
   };
 
   const handlePositionClick = (team, position) => {
+    const positions = team === 'home' ? homePositions : awayPositions;
+    console.log("Posiciones antes de la actualización:", positions);
+  
     if (isMatchStarted) {
       setSelectedTeam(team);
       setSelectedPosition(position);
-      setIsModalOpen(true); // Abre el modal para seleccionar tipo de punto
+      setIsModalOpen(true);  // Abre el modal para seleccionar tipo de punto
     }
   };
+  
+
 
   const handlePointTypeSelect = async (pointType) => {
     await incrementScore(selectedTeam, pointType);
-
+  
     const positions = selectedTeam === 'home' ? homePositions : awayPositions;
     const playerName = positions[selectedPosition - 1];
-    const player = match?.player_performances?.find(p => p.player_name === playerName);
-
-    if (player) {
+  
+    const players = selectedTeam === 'home' ? match.home_team.players : match.away_team.players;
+    const player = players.find(p => p.name.toLowerCase().trim() === playerName.toLowerCase().trim());
+  
+    // Aquí debes obtener el performanceId, no el playerId
+    const playerPerformance = match.player_performances.find(p => p.player.id === player.id);
+  
+    if (playerPerformance) {
       try {
-        await api.updatePlayerPerformance(player.id, {
-          points: 1
+        await api.updatePlayerPerformance(playerPerformance.id, {
+          points: 1,
+          pointType: pointType
         });
       } catch (error) {
         console.error('Error updating player performance:', error);
       }
+    } else {
+      console.error("No se encontró ninguna performance para el jugador", playerName);
     }
-
-    setIsModalOpen(false); // Cierra el modal
+  
+    setIsModalOpen(false);  // Cierra el modal
   };
+  
+  
+  
+  
+  
+  
 
   const renderCourt = (team) => {
     const positions = team === 'home' ? homePositions : awayPositions;
     const setPositions = team === 'home' ? setHomePositions : setAwayPositions;
-
+  
     return (
       <div className="grid grid-rows-3 grid-cols-2 gap-2 w-full h-96 bg-green-200 dark:bg-green-800 border-2 border-white dark:border-gray-600 p-2 rounded-lg">
         {positions.map((player, index) => (
@@ -218,7 +270,7 @@ const VolleyballMatch = () => {
             ) : (
               <input
                 type="text"
-                value={player}
+                value={player}  // Aquí debería haber un nombre de jugador.
                 onChange={(e) => {
                   const newPositions = [...positions];
                   newPositions[index] = e.target.value;
@@ -233,6 +285,8 @@ const VolleyballMatch = () => {
       </div>
     );
   };
+  
+  
 
   if (loading) {
     return <div className="text-center text-2xl">Cargando...</div>;

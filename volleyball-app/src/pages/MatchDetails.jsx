@@ -47,16 +47,16 @@ const MatchDetails = () => {
       const matchData = matchResponse.data;
       const statsData = statsResponse.data;
       
-      setState(prev => ({
-        ...prev,
-        match: matchData,
-        editedMatch: {
-          ...matchData,
-          date: matchData.date.split('.')[0]
-        },
-        statistics: statsData,
-        loading: false
-      }));
+      console.log("Datos del matchData:", matchData);  // Verifica la respuesta aquí
+      console.log("Datos del statsData:",  statsData);  // Verifica la respuesta aquí
+
+      
+        setState(prev => ({
+          ...prev,
+          match: matchData,
+          statistics: statsData,
+          loading: false,
+        }));
 
       if (matchData.location) {
         try {
@@ -187,63 +187,64 @@ const MatchDetails = () => {
 
   const renderPlayerStats = (player, title, icon) => {
     if (!player) {
-      return (
-        <StatisticCard title={title} icon={icon} isEmpty={true}>
-          <p className="text-gray-500">No hay datos disponibles</p>
-        </StatisticCard>
-      );
+        return (
+            <StatisticCard title={title} icon={icon} isEmpty={true}>
+                <p className="text-gray-500">No hay datos disponibles</p>
+            </StatisticCard>
+        );
     }
 
     return (
-      <StatisticCard title={title} icon={icon}>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <p className="font-semibold">Nombre:</p>
-            <p>{player.name}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Número de camiseta:</p>
-            <p>{player.jersey_number}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Posición:</p>
-            <p>{player.position}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Total de puntos:</p>
-            <p>{player.total_points}</p>
-          </div>
-        </div>
-        {title === "Mejor Anotador" && (
-          <div>
-            <p className="font-semibold">Ataques realizados:</p>
-            <p>{player.spike_attempts}</p>
-          </div>
-        )}
-        {title === "Mejor Sacador" && (
-          <div>
-            <p className="font-semibold">Total de aces:</p>
-            <p>{player.total_aces}</p>
-          </div>
-        )}
-        <div className="mt-4">
-          <p className="font-semibold mb-2">Puntos por Set:</p>
-          {player.points_per_set && player.points_per_set.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {player.points_per_set.map((set, index) => (
-                <div key={index} className="bg-gray-100 dark:bg-gray-700 p-2 rounded">
-                  <p className="font-medium">Set {set.set__set_number}</p>
-                  <p>{set.points} puntos</p>
+        <StatisticCard title={title} icon={icon}>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p className="font-semibold">Nombre:</p>
+                    <p>{player.name}</p>
                 </div>
-              ))}
+                <div>
+                    <p className="font-semibold">Número de camiseta:</p>
+                    <p>{player.jersey_number}</p>
+                </div>
+                <div>
+                    <p className="font-semibold">Posición:</p>
+                    <p>{player.position}</p>
+                </div>
+                <div>
+                    <p className="font-semibold">Total de puntos:</p>
+                    <p>{player.total_points}</p>
+                </div>
             </div>
-          ) : (
-            <p className="text-gray-500">No hay datos de sets disponibles</p>
-          )}
-        </div>
-      </StatisticCard>
+            {title === "Mejor Anotador" && (
+                <div>
+                    <p className="font-semibold">Ataques realizados:</p>
+                    <p>{player.spike_attempts}</p>
+                </div>
+            )}
+            {title === "Mejor Sacador" && (
+                <div>
+                    <p className="font-semibold">Total de aces:</p>
+                    <p>{player.total_aces}</p>
+                </div>
+            )}
+            <div className="mt-4">
+                <p className="font-semibold mb-2">Puntos por Set:</p>
+                {player.points_per_set && player.points_per_set.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                        {player.points_per_set.map((set, index) => (
+                            <div key={index} className="bg-gray-100 dark:bg-gray-700 p-2 rounded">
+                                <p className="font-medium">Set {set.set__set_number}</p>
+                                <p>{set.points} puntos</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-500">No hay datos de sets disponibles</p>
+                )}
+            </div>
+        </StatisticCard>
     );
-  };
+};
+
 
   const renderStatistics = () => {
     const { statistics } = state;

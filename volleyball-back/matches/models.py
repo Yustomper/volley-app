@@ -1,3 +1,5 @@
+
+# matches/models.py
 from django.db import models
 from teams.models import Team, Player
 
@@ -33,15 +35,16 @@ class Set(models.Model):
 
 class PlayerPerformance(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='player_performances')
-    set = models.ForeignKey(Set, on_delete=models.CASCADE, related_name='player_performances', null=True, blank=True)  # Ahora opcional
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    set = models.ForeignKey(Set, on_delete=models.CASCADE, null=True, blank=True) 
     points = models.PositiveIntegerField(default=0)
-    spike_points = models.PositiveIntegerField(default=0, null=True, blank=True)
-    block_points = models.PositiveIntegerField(default=0, null=True, blank=True)
-    aces = models.PositiveIntegerField(default=0, null=True, blank=True)
-    errors = models.PositiveIntegerField(default=0, null=True, blank=True)
+    spike_points = models.PositiveIntegerField(default=0)
+    block_points = models.PositiveIntegerField(default=0)
+    aces = models.PositiveIntegerField(default=0)
+    errors = models.PositiveIntegerField(default=0)
     
     def __str__(self):
+        
         set_info = f"Set {self.set.set_number}" if self.set else "No set"
         return f"{self.player} performance in {self.match} {set_info}"
 

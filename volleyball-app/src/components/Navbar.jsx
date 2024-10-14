@@ -28,7 +28,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center">
             {token ? (
               <>
-                <Link to="/equipos" className="px-3 py-2 rounded-md text-sm font-medium">Equipos</Link>
+                <Link to="/team" className="px-3 py-2 rounded-md text-sm font-medium">Equipos</Link>
                 <Link to="/matches" className="px-3 py-2 rounded-md text-sm font-medium">Partidos</Link>
                 <Link to="/statistics" className="px-3 py-2 rounded-md text-sm font-medium">Estadísticas</Link>
                 <button onClick={logout} className="px-3 py-2 rounded-md text-sm font-medium">Cerrar sesión</button>

@@ -94,7 +94,12 @@ const Matches = () => {
               Ubicación: {match.location}
             </p>
             <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Estado: {match.is_finished ? 'Finalizado' : 'En progreso'}
+              Estado:{' '}
+              {match.status === 'upcoming' && 'Próximamente'}
+              {match.status === 'live' && 'En vivo'}
+              {match.status === 'finished' && 'Finalizado'}
+              {match.status === 'suspended' && 'Suspendido'}
+              {match.status === 'rescheduled' && 'Reprogramado'}
             </p>
             <Link
               to={`/match-details/${match.id}`}

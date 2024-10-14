@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message }) => {
   const { isDarkMode } = useTheme();

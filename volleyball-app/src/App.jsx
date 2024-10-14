@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Importación de páginas
 import Home from './pages/Home';
-import Equipos from './pages/Equipos';
+import Team from './modules/team/pages/Team';
 import Matches from './pages/Matches';
 import MatchForm from './pages/MatchForm';
 import Statistics from './pages/Statistics';
@@ -29,7 +29,7 @@ function App() {
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/equipos" element={<Equipos />} />
+                <Route path="/team" element={<Team />} />
                 <Route path="/matches" element={<Matches />} />
                 <Route path="/create-match" element={<MatchForm />} />
                 <Route path="/edit-match/:id" element={<MatchForm />} />

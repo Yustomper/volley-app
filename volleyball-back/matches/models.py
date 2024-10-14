@@ -5,13 +5,20 @@ from teams.models import Team, Player
 
 # matches/models.py
 class Match(models.Model):
+    STATUS_CHOICES = [
+        ('upcoming', 'Próximamente'),
+        ('live', 'En Vivo'),
+        ('finished', 'Finalizado'),
+        ('suspended', 'Suspendido'),
+        ('rescheduled', 'Reprogramado')
+    ]  
     home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
     away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
     date = models.DateTimeField()
     location = models.CharField(max_length=255)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    is_finished = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     duration = models.DurationField(null=True, blank=True)

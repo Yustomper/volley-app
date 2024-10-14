@@ -38,6 +38,35 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 - **Frontend**: [Vercel](https://vercel.com/)
 - **Base de Datos**: [Atlas](https://www.mongodb.com/atlas/database)
 
+
+## API Endpoints
+
+### Gestión de Equipos (Team)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET    | `/api/teams/` | Obtener todos los equipos con paginación, búsqueda y ordenamiento |
+| POST   | `/api/teams/` | Crear un nuevo equipo |
+| GET    | `/api/teams/{id}/` | Obtener los detalles de un equipo específico |
+| PUT    | `/api/teams/{id}/` | Actualizar un equipo existente |
+| DELETE | `/api/teams/{id}/` | Eliminar un equipo específico |
+
+### Gestión de Jugadores (Players)
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET    | `/api/teams/players/` | Obtener todos los jugadores con paginación, búsqueda y ordenamiento |
+| POST   | `/api/teams/players/` | Crear un nuevo jugador |
+| GET    | `/api/teams/players/{id}/` | Obtener los detalles de un jugador específico |
+| PUT    | `/api/teams/players/{id}/` | Actualizar los detalles de un jugador |
+| DELETE | `/api/teams/players/{id}/` | Eliminar un jugador específico |
+
+### Operaciones de Jugadores en Equipos
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| DELETE | `/api/teams/{teamId}/players/{playerId}/` | Eliminar un jugador de un equipo específico |
+
 ---
 
 ## Instalación

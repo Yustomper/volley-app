@@ -36,7 +36,7 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 
-                  'location', 'latitude', 'longitude', 'is_finished', 'sets', 
+                  'location', 'latitude', 'longitude', 'status', 'sets', 
                   'player_performances', 'start_time', 'duration', 'top_scorer', 'best_server']
 
     def to_representation(self, instance):

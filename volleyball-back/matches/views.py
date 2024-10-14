@@ -16,11 +16,15 @@ class MatchViewSet(viewsets.ModelViewSet):
     def start_match(self, request, pk=None):
         try:
             match = self.get_object()
+    
+            if match.status != 'upcoming':
+                return Response({"error": "El partido ya ha comenzado o no está en estado Próximamente"}, status=status.HTTP_400_BAD_REQUEST)
 
             if match.start_time is not None:
                 return Response({"error": "El partido ya ha comenzado"}, status=status.HTTP_400_BAD_REQUEST)
 
             match.start_time = timezone.now()
+            match.status = 'live' 
             match.save()
 
             # Crear registros de PlayerPerformance para cada jugador en el partido
@@ -62,15 +66,43 @@ class MatchViewSet(viewsets.ModelViewSet):
         match = self.get_object()
         if match.start_time is None:
             return Response({"error": "Match has not started yet"}, status=status.HTTP_400_BAD_REQUEST)
-        if match.is_finished:
-            return Response({"error": "Match has already ended"}, status=status.HTTP_400_BAD_REQUEST)
+        if match.status != 'live':
+            return Response({"error": "El partido no está en vivo"}, status=status.HTTP_400_BAD_REQUEST)
 
         end_time = timezone.now()
         match.duration = end_time - match.start_time
-        match.is_finished = True
+        match.status = 'finished' 
+        match.end_time = end_time
         match.save()
-        return Response({"message": "Match ended", "duration": match.duration})
+        return Response({"message": "El partido ha finalizado", "duration": match.duration})
+    
+    @action(detail=True, methods=['POST'])
+    def suspend_match(self, request, pk=None):
+        match = self.get_object()
+        if match.status != 'live':
+            return Response({"error": "El partido no está en vivo"}, status=status.HTTP_400_BAD_REQUEST)
 
+        match.status = 'suspended'  # Cambiar el estado a "Suspendido"
+        match.save()
+
+        return Response({"message": "El partido ha sido suspendido"})
+
+    @action(detail=True, methods=['POST'])
+    def reschedule_match(self, request, pk=None):
+        match = self.get_object()
+
+        new_date = request.data.get('new_date')
+        if not new_date:
+            return Response({"error": "Debe proporcionar una nueva fecha"}, status=status.HTTP_400_BAD_REQUEST)
+
+        match.date = new_date
+        match.status = 'rescheduled'  # Cambiar el estado a "Reprogramado"
+        match.save()
+
+        return Response({"message": "El partido ha sido reprogramado", "new_date": new_date})
+
+        
+    
     @action(detail=True, methods=['POST'])
     def update_score(self, request, pk=None):
         match = self.get_object()
@@ -94,6 +126,8 @@ class MatchViewSet(viewsets.ModelViewSet):
             set_obj.save()
 
         return Response({"message": "Score updated successfully"})
+
+
 
     @action(detail=True, methods=['POST'])
     def update_player_performance(self, request, pk=None):

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/solid';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 const AddTeamModal = ({ open, onClose, onSubmit, editingTeam }) => {
   const { isDarkMode } = useTheme();
@@ -41,7 +41,7 @@ const AddTeamModal = ({ open, onClose, onSubmit, editingTeam }) => {
   };
 
   const handleSubmit = () => {
-    if (teamName && players.length >= 5 && players.every(player => player.name && player.jerseyNumber)) {
+    if (teamName && players.length >=  6 && players.every(player => player.name && player.jerseyNumber)) {
       onSubmit({
         id: editingTeam?.id,
         name: teamName,
@@ -53,13 +53,14 @@ const AddTeamModal = ({ open, onClose, onSubmit, editingTeam }) => {
       });
       onClose();
     } else {
-      alert('Por favor, completa todos los campos obligatorios y asegúrate de tener entre 5 y 12 jugadores.');
+      alert('Por favor, completa todos los campos obligatorios y asegúrate de tener al menos 6 jugadores');
     }
   };
 
   if (!open) return null;
 
   return (
+    
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-8 max-w-2xl w-full`}>
         <div className="flex justify-between items-center mb-6">
@@ -121,6 +122,7 @@ const AddTeamModal = ({ open, onClose, onSubmit, editingTeam }) => {
         </button>
       </div>
     </div>
+   
   );
 };
 

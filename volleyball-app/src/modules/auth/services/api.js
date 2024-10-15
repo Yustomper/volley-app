@@ -15,8 +15,8 @@ const createAxiosInstance = () => {
 
 const api = {
   // Autenticación
-  login: (credentials) => axios.post(`${API_URL}api/auth/login/`, credentials),
-  register: (userData) => axios.post(`${API_URL}api/auth/register/`, userData),
+  login: (credentials) => axios.post(`${API_URL}/api/auth/login/`, credentials),
+  register: (userData) => axios.post(`${API_URL}/api/auth/register/`, userData),
 
   logout: () => createAxiosInstance().post(`/api/auth/logout/`),
 

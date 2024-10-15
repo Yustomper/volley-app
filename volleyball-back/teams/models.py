@@ -26,7 +26,8 @@ class Player(models.Model):
     avatar_url = models.URLField(blank=True, null=True)
     position = models.CharField(max_length=2, choices=POSITION_CHOICES, null=True, blank=True)
     DEFAULT_AVATAR_URL = "https://cdn.icon-icons.com/icons2/2643/PNG/512/female_woman_person_people_avatar_icon_159366.png"
-
+    is_holding = models.BooleanField(default=False)
+    
     def save(self, *args, **kwargs):
         if not self.avatar_url:
             self.avatar_url = self.DEFAULT_AVATAR_URL

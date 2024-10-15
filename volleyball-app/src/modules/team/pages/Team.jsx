@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../../context/ThemeContext';
 import { useTeams } from '../hooks/useTeams';
 import { useModal } from '../hooks/useModal';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import TeamList from '../components/TeamList';
 import AddTeamModal from '../components/AddTeamModal';
 import ConfirmModal from '../components/ConfirmModal';
@@ -12,18 +10,42 @@ import { PlusIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 export default function Team() {
   const { isDarkMode } = useTheme();
   const {
-    isModalOpen, editingTeam, confirmModal,openModal, closeModal,  
-    closeConfirmModal, setEditingTeam } = useModal();
+    isModalOpen, editingTeam, confirmModal, openModal, closeModal,  
+    closeConfirmModal, setEditingTeam
+  } = useModal();
 
   const {
-    teams, loading, pagination, orderBy, sortOrder,handlePageChange, handleSearch, handleOrderBy, 
-    handleUpdateTeam, handleAddTeam,    handleRemoveTeam, handleRemovePlayer, handleEditTeam
-  } = useTeams({openModal,setEditingTeam,closeModal});
+    teams, loading, pagination, orderBy, sortOrder, handlePageChange, handleSearch, handleOrderBy, 
+    handleUpdateTeam, handleAddTeam, handleRemoveTeam, handleRemovePlayer, handleEditTeam
+  } = useTeams({openModal, setEditingTeam, closeModal});
 
-  
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleTeamAction = async (action, ...args) => {
+    try {
+      await action(...args);
+      showNotification('Operación realizada con éxito');
+    } catch (error) {
+      showNotification('Error al realizar la operación', 'error');
+    }
+  };
+
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
+        {notification && (
+          <div className={`fixed top-4 right-4 p-4 rounded-md ${
+            notification.type === 'error' ? 'bg-red-500' : 'bg-green-500'
+          } text-white`}>
+            {notification.message}
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-8">
           <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
             Gestión de Equipos
@@ -57,12 +79,11 @@ export default function Team() {
         <TeamList
           teams={teams}
           loading={loading}
-          handleRemoveTeam={handleRemoveTeam}  
-          handleRemovePlayer={handleRemovePlayer}
+          handleRemoveTeam={(teamId) => handleTeamAction(handleRemoveTeam, teamId)}
+          handleRemovePlayer={(teamId, playerId) => handleTeamAction(handleRemovePlayer, teamId, playerId)}
           handleEditTeam={handleEditTeam}
         />
 
-        {/* Paginación */}
         <div className="mt-8 flex justify-center items-center space-x-4">
           <button onClick={() => handlePageChange(pagination.page - 1)} disabled={pagination.page === 1}>
             <ChevronLeft className="w-6 h-6" />
@@ -76,12 +97,11 @@ export default function Team() {
         <AddTeamModal
           open={isModalOpen}
           onClose={closeModal}
-          onSubmit={editingTeam ? handleUpdateTeam : handleAddTeam} 
+          onSubmit={(team) => handleTeamAction(editingTeam ? handleUpdateTeam : handleAddTeam, team)}
           editingTeam={editingTeam}
         />
 
         <ConfirmModal isOpen={confirmModal.isOpen} onClose={closeConfirmModal} />
-        <ToastContainer />
       </div>
     </div>
   );

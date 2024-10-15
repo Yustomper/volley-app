@@ -14,43 +14,6 @@ const createAxiosInstance = () => {
 };
 
 const api = {
-  // Autenticación
-  login: (credentials) => axios.post(`${API_URL}/api/auth/login/`, credentials),
-  register: (userData) => axios.post(`${API_URL}/api/auth/register/`, userData),
-  logout: () => createAxiosInstance().post(`/api/auth/logout/`),
-
-  // Usuario
-  getCurrentUser: () => createAxiosInstance().get(`/api/auth/user/`),
-
-  // Equipos con paginación, búsqueda y ordenamiento
-  getTeams: ({ page = 1, search = "", ordering = "name" } = {}) =>
-    createAxiosInstance().get(`/api/teams/`, {
-      params: {
-        page,
-        search,
-        ordering,
-      },
-    }),
-  createTeam: (teamData) => createAxiosInstance().post(`/api/teams/`, teamData),
-  updateTeam: (teamId, teamData) =>
-    createAxiosInstance().put(`/api/teams/${teamId}/`, teamData),
-  deleteTeam: (teamId) => createAxiosInstance().delete(`/api/teams/${teamId}/`),
-
-  // Jugadores con paginación, búsqueda y ordenamiento
-  getPlayers: ({ page = 1, search = "", ordering = "name" } = {}) =>
-    createAxiosInstance().get(`/api/teams/players/`, {
-      params: {
-        page,
-        search,
-        ordering,
-      },
-    }),
-  createPlayer: (playerData) =>
-    createAxiosInstance().post(`/api/teams/players/`, playerData),
-  updatePlayer: (playerId, playerData) =>
-    createAxiosInstance().put(`/api/teams/players/${playerId}/`, playerData),
-  deletePlayer: (playerId) =>
-    createAxiosInstance().delete(`/api/teams/players/${playerId}/`),
 
   // Matches
   getMatches: (params) => createAxiosInstance().get("/api/matches/", { params }),

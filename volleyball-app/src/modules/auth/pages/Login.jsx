@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import axios from 'axios';
-import api from '../services/api';
+import { useTheme } from '../../../context/ThemeContext';
+import api from '../../auth/services/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({

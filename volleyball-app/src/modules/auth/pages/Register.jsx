@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
 import { useTheme } from '../../../context/ThemeContext';
-import {useRegister} from '../hooks/useRegister';
-import {RegisterForm} from '../components/RegisterForm';
+import useRegister from '../hooks/useRegister';
+import RegisterForm from '/src/modules/auth/components/RegisterForm.jsx';
 
 const Register = () => {
   const { username, email, password, confirmPassword, 
-    setUsername, setEmail, setPassword, setConfirmPassword } = useRegister();
+    setUsername, setEmail, setPassword, setConfirmPassword, handleSubmit } = useRegister();  // Asegúrate de obtener handleSubmit
   const { isDarkMode } = useTheme(); 
 
   return (
@@ -24,7 +23,7 @@ const Register = () => {
           setEmail={setEmail}
           setPassword={setPassword}
           setConfirmPassword={setConfirmPassword}
-          handleSubmit={useRegister}
+          handleSubmit={handleSubmit} 
           isDarkMode={isDarkMode}
         />
       </div>

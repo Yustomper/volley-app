@@ -1,3 +1,4 @@
+
 # Volley App 🏐
 
 [![Django](https://img.shields.io/badge/Django-4.0.5-green)](https://www.djangoproject.com/)
@@ -38,34 +39,41 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 - **Frontend**: [Vercel](https://vercel.com/)
 - **Base de Datos**: [Atlas](https://www.mongodb.com/atlas/database)
 
-
 ## API Endpoints
+
+### Autenticación (Auth)
+
+| Método | Endpoint           | Descripción                                |
+|--------|--------------------|--------------------------------------------|
+| POST   | `/api/auth/login/` | Iniciar sesión y obtener un token JWT.    |
+| POST   | `/api/auth/register/` | Registrar un nuevo usuario.               |
+| POST   | `/api/auth/logout/` | Cerrar sesión (opcional, si se implementa). |
 
 ### Gestión de Equipos (Team)
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET    | `/api/teams/` | Obtener todos los equipos con paginación, búsqueda y ordenamiento |
-| POST   | `/api/teams/` | Crear un nuevo equipo |
-| GET    | `/api/teams/{id}/` | Obtener los detalles de un equipo específico |
-| PUT    | `/api/teams/{id}/` | Actualizar un equipo existente |
-| DELETE | `/api/teams/{id}/` | Eliminar un equipo específico |
+| Método | Endpoint           | Descripción                                 |
+|--------|--------------------|---------------------------------------------|
+| GET    | `/api/teams/`      | Obtener todos los equipos con paginación, búsqueda y ordenamiento. |
+| POST   | `/api/teams/`      | Crear un nuevo equipo.                      |
+| GET    | `/api/teams/{id}/` | Obtener los detalles de un equipo específico. |
+| PUT    | `/api/teams/{id}/` | Actualizar un equipo existente.             |
+| DELETE | `/api/teams/{id}/` | Eliminar un equipo específico.              |
 
 ### Gestión de Jugadores (Players)
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET    | `/api/teams/players/` | Obtener todos los jugadores con paginación, búsqueda y ordenamiento |
-| POST   | `/api/teams/players/` | Crear un nuevo jugador |
-| GET    | `/api/teams/players/{id}/` | Obtener los detalles de un jugador específico |
-| PUT    | `/api/teams/players/{id}/` | Actualizar los detalles de un jugador |
-| DELETE | `/api/teams/players/{id}/` | Eliminar un jugador específico |
+| Método | Endpoint                   | Descripción                                 |
+|--------|----------------------------|---------------------------------------------|
+| GET    | `/api/teams/players/`      | Obtener todos los jugadores con paginación, búsqueda y ordenamiento. |
+| POST   | `/api/teams/players/`      | Crear un nuevo jugador.                    |
+| GET    | `/api/teams/players/{id}/` | Obtener los detalles de un jugador específico. |
+| PUT    | `/api/teams/players/{id}/` | Actualizar los detalles de un jugador.     |
+| DELETE | `/api/teams/players/{id}/` | Eliminar un jugador específico.             |
 
 ### Operaciones de Jugadores en Equipos
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| DELETE | `/api/teams/{teamId}/players/{playerId}/` | Eliminar un jugador de un equipo específico |
+| Método | Endpoint                       | Descripción                                      |
+|--------|--------------------------------|--------------------------------------------------|
+| DELETE | `/api/teams/{teamId}/players/{playerId}/` | Eliminar un jugador de un equipo específico.    |
 
 ---
 
@@ -78,61 +86,67 @@ Clona el proyecto desde GitHub:
 ```
 git clone https://github.com/Yustomper/volley-app.git
 ```
-2. Configuración del Backend (Django)
+
+### 2. Configuración del Backend (Django)
+
 2.1 Navegar a la carpeta del backend:
 ```
 cd volleyball-back
 ```
+
 2.2 Crear y activar el entorno virtual:
 ```
 python -m venv venv
 # En Linux: source venv/bin/activate 
 # En Windows: venv\Scripts\activate
 ```
+
 2.3 Instalar las dependencias:
 ```
 pip install -r requirements.txt
 ```
+
 2.4 Configurar las variables de entorno:
 Crea un archivo .env en la carpeta volleyball-back con las siguientes variables:
 ```
-env
-Copiar código
 SECRET_KEY=<tu_clave_secreta>
 DEBUG=True
 DATABASE_URL=postgresql://<usuario>:<contraseña>@<host>/<nombre_bd>
 ```
+
 2.5 Aplicar las migraciones:
 ```
 python manage.py migrate
 ```
+
 2.6 Ejecutar el servidor de desarrollo:
 ```
 python manage.py runserver
 ```
 El backend estará disponible en http://127.0.0.1:8000/.
 
-3. Configuración del Frontend (React)
+### 3. Configuración del Frontend (React)
+
 3.1 Navegar a la carpeta del frontend:
 ```
 cd ../volleyball-app
 ```
+
 3.2 Instalar las dependencias:
 ```
 npm install
 ```
+
 3.3 Ejecutar el servidor de desarrollo:
 ```
 npm run dev
 ```
 El frontend estará disponible en http://localhost:3000/.
 
-Despliegue
-Backend
-El backend está desplegado en Render. Puedes acceder al proyecto a través de la URL de Render.
+## Despliegue
 
-Frontend
-El frontend está desplegado en Vercel. Puedes acceder a la aplicación a través de la URL de Vercel.
+**Backend:** El backend está desplegado en Render. Puedes acceder al proyecto a través de la URL de Render.
 
-Base de Datos
-La base de datos PostgreSQL está alojada en Atlas. Asegúrate de configurar correctamente la conexión a la base de datos en tu entorno de despliegue.
+**Frontend:** El frontend está desplegado en Vercel. Puedes acceder a la aplicación a través de la URL de Vercel.
+
+**Base de Datos:** La base de datos PostgreSQL está alojada en Atlas. Asegúrate de configurar correctamente la conexión a la base de datos en tu entorno de despliegue.

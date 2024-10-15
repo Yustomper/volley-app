@@ -24,7 +24,6 @@ const Home = () => {
   useEffect(() => {
     const wakeUpBackend = async () => {
       try {
-        // URL directa al backend
         await fetch(import.meta.env.VITE_BACKEND_API, {
           method: 'GET'
         });

@@ -9,13 +9,13 @@ import 'react-toastify/dist/ReactToastify.css';
 // Importación de páginas
 import Home from './pages/Home';
 import Team from './modules/team/pages/Team';
-import Matches from './pages/Matches';
-import MatchForm from './pages/MatchForm';
+import Matches from './modules/matches/pages/Matches';
+import MatchDetails from './modules/matches/pages/MatchDetails';
 import Statistics from './pages/Statistics';
 import LiveScoreBoard from './components/LiveScoreBoard';
 import Login from './modules/auth/pages/Login';
 import Register from './modules/auth/pages/Register';
-import MatchDetails from './pages/MatchDetails';
+
 import NotFound from './components/NotFound';
 import VolleyballMatch from './components/VolleyballMatch';
 
@@ -29,15 +29,13 @@ function App() {
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/matches" element={<Matches />} />
-                <Route path="/create-match" element={<MatchForm />} />
-                <Route path="/edit-match/:id" element={<MatchForm />} />
-                <Route path="/statistics" element={<Statistics />} />
-                <Route path="/live-scoreboard/:matchId" element={<LiveScoreBoard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/matches" element={<Matches />} />
                 <Route path="/match-details/:matchId" element={<MatchDetails />} />
+                <Route path="/statistics" element={<Statistics />} />
+                <Route path="/live-scoreboard/:matchId" element={<LiveScoreBoard />} />
                 <Route path="/volleyball/:matchId" element={<VolleyballMatch />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

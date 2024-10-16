@@ -1,6 +1,6 @@
 import React from 'react';
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import { useTheme } from '../context/ThemeContext';
+import { IoClose } from "react-icons/io5";
+import { useTheme } from '../../../context/ThemeContext';
 
 const PointTypeModal = ({ open, onClose, onPointTypeSelect }) => {
   const { isDarkMode } = useTheme();
@@ -15,7 +15,7 @@ const PointTypeModal = ({ open, onClose, onPointTypeSelect }) => {
             Seleccionar Tipo de Punto
           </h2>
           <button onClick={onClose} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-pink-500 hover:text-pink-700'}`}>
-            <XMarkIcon className="h-6 w-6" />
+            <IoClose  className="h-6 w-6" />
           </button>
         </div>
 

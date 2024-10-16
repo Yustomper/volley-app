@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.1.10",
-    "@heroicons/react": "^2.1.5",
+    "@heroicons/react": "^1.0.6",
     "axios": "^1.7.7",
     "lodash": "^4.17.21",
     "lucide-react": "^0.447.0",

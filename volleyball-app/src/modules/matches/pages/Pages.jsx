@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MatchForm from '../components/MatchForm';
+import MatchForm from '../../../components/MatchForm';
 
 const Matches = () => {
   const [matches, setMatches] = useState([

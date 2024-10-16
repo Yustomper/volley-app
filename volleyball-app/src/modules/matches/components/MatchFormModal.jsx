@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
-import api from '../services/api';
+import { useTheme } from '../../../context/ThemeContext'; // Contexto del tema (claro/oscuro)
+import apiClima from '../../../services/api';
+import api from '../services/matchesService';
+
 import { toast } from 'react-toastify';
 import { debounce } from 'lodash';
+import { IoClose } from "react-icons/io5";
 
-const MatchForm = () => {
+const MatchFormModal = ({ open, onClose, onSubmit }) => {
   const { isDarkMode } = useTheme();
-  const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
@@ -22,8 +23,8 @@ const MatchForm = () => {
   });
 
   useEffect(() => {
-    fetchTeams();
-  }, []);
+    if (open) fetchTeams(); 
+  }, [open]);
 
   const fetchTeams = async () => {
     try {
@@ -49,7 +50,7 @@ const MatchForm = () => {
 
   const debouncedSearchLocations = debounce(async (query) => {
     if (query.length > 2) {
-      const results = await api.searchLocations(query);  // Aquí usamos la función de búsqueda
+      const results = await apiClima.searchLocations(query);  // Aquí usamos la función de búsqueda
       setLocations(results);
     } else {
       setLocations([]);
@@ -76,22 +77,27 @@ const MatchForm = () => {
       delete matchData.time;
       await api.createMatch(matchData);  // Creamos el partido con las coordenadas
       toast.success('Partido creado exitosamente');
-      navigate('/matches');
+      onSubmit(); 
+      onClose(); 
     } catch (error) {
       console.error('Error al crear el partido:', error);
       toast.error('Error al crear el partido');
     }
   };
 
-  if (loading) {
-    return <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'} flex items-center justify-center`}>Cargando...</div>;
-  }
+  if (!open) return null;
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className={`text-4xl font-bold mb-8 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Crear Partido</h1>
-        <form onSubmit={handleSubmit} className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-xl shadow-lg w-full max-w-2xl`}>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Crear Partido</h1>
+          <button onClick={onClose} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}>
+            <IoClose  className="h-6 w-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select
               name="home_team_id"
@@ -105,6 +111,7 @@ const MatchForm = () => {
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>
+
             <select
               name="away_team_id"
               value={match.away_team_id}
@@ -117,6 +124,7 @@ const MatchForm = () => {
                 <option key={team.id} value={team.id}>{team.name}</option>
               ))}
             </select>
+
             <input
               type="date"
               name="date"
@@ -125,6 +133,7 @@ const MatchForm = () => {
               className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'}`}
               required
             />
+
             <input
               type="time"
               name="time"
@@ -133,6 +142,7 @@ const MatchForm = () => {
               className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'}`}
               required
             />
+
             <div className="relative">
               <input
                 type="text"
@@ -158,6 +168,7 @@ const MatchForm = () => {
               )}
             </div>
           </div>
+
           <button
             type="submit"
             className={`mt-4 w-full p-2 rounded-lg ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'} text-white transition duration-300`}
@@ -170,4 +181,4 @@ const MatchForm = () => {
   );
 };
 
-export default MatchForm;
+export default MatchFormModal;

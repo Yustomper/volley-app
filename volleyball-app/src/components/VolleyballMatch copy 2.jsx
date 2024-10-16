@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { FaPlus, FaMinus, FaPlay, FaStop } from 'react-icons/fa';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
-import PointTypeModal from '../modules/matches/components/PointTypeModal'; // Asegúrate de tener el componente modal
+import PointTypeModal from './PointTypeModal'; // Asegúrate de tener el componente modal
 
 const VolleyballMatch = () => {
   const { isDarkMode } = useTheme();

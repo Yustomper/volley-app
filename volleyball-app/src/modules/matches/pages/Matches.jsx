@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import api from '../services/api';
+import api from '../services/matchesService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MatchFormModal  from '../components/MatchFormModal';
 
 const Matches = () => {
   const { isDarkMode } = useTheme();
@@ -13,12 +14,9 @@ const Matches = () => {
   const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [pagination, setPagination] = useState({ page: 1, pageSize: 6, total: 0 });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchMatches();
-  }, [search, sortOrder, pagination.page]);
-
-  const fetchMatches = async () => {
+  const fetchMatches = useCallback(async () => {
     try {
       setLoading(true);
       const params = {
@@ -49,7 +47,11 @@ const Matches = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.page, search, sortOrder]);
+
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
 
   const handleSearch = (event) => {
     setSearch(event.target.value);
@@ -64,6 +66,18 @@ const Matches = () => {
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
+
+  const handleMatchSubmit = () => {
+    setIsModalOpen(false);
+    fetchMatches();
+  };
+
+
+  
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
 
   const renderMatchesList = () => {
     if (loading) {
@@ -94,12 +108,15 @@ const Matches = () => {
               Ubicación: {match.location}
             </p>
             <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Estado:{' '}
-              {match.status === 'upcoming' && 'Próximamente'}
-              {match.status === 'live' && 'En vivo'}
-              {match.status === 'finished' && 'Finalizado'}
-              {match.status === 'suspended' && 'Suspendido'}
-              {match.status === 'rescheduled' && 'Reprogramado'}
+              Estado: {
+                {
+                  'upcoming': 'Próximamente',
+                  'live': 'En vivo',
+                  'finished': 'Finalizado',
+                  'suspended': 'Suspendido',
+                  'rescheduled': 'Reprogramado'
+                }[match.status] || 'Desconocido'
+              }
             </p>
             <Link
               to={`/match-details/${match.id}`}
@@ -117,19 +134,21 @@ const Matches = () => {
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize);
 
+
+  
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Partidos</h1>
-          <Link
-            to="/create-match"
+          <button
+            onClick={() => setIsModalOpen(true)}
             className={`${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-500 hover:bg-orange-600'} 
               text-white px-6 py-3 rounded-full transition duration-300 flex items-center`}
           >
             <Plus className="w-5 h-5 mr-2" />
             Crear Partido
-          </Link>
+          </button>
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -180,6 +199,14 @@ const Matches = () => {
             </button>
           </div>
         )}
+        
+
+                {/* Invocando el Modal */}
+            <MatchFormModal 
+              open={isModalOpen}
+              onClose={handleModalClose}
+              onSubmit={handleMatchSubmit}
+            />
       </div>
 
       <ToastContainer 

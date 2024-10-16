@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 import {
   WiDaySunny,
   WiCloudy,
@@ -9,7 +9,7 @@ import {
   WiDayThunderstorm
 } from 'react-icons/wi';
 import { FaEdit, FaTrash, FaSave, FaTimes, FaPlay, FaVolleyballBall, FaTrophy } from 'react-icons/fa';
-import api from '../services/api';
+import api from '../services/matchesService';
 
 const MatchDetails = () => {
   const { isDarkMode } = useTheme();

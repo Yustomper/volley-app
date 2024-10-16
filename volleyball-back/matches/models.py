@@ -3,7 +3,10 @@
 from django.db import models
 from teams.models import Team, Player
 
+
 # matches/models.py
+
+
 class Match(models.Model):
     STATUS_CHOICES = [
         ('upcoming', 'Próximamente'),
@@ -24,9 +27,13 @@ class Match(models.Model):
     duration = models.DurationField(null=True, blank=True)
     total_spectators = models.PositiveIntegerField(null=True, blank=True)
     match_notes = models.TextField(blank=True)
+    current_weather = models.ForeignKey('weather.Weather', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_for_match')
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.date}"
+
+
+    
 
 class Set(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='sets')

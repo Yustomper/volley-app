@@ -3,6 +3,7 @@ from django.db.models import Sum, F, OuterRef, Subquery
 from .models import Match, Set, PlayerPerformance
 from teams.models import Team
 from teams.serializers import TeamSerializer
+from weather.serializers import WeatherSerializer
 
 class SetSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +23,10 @@ class TopPerformerSerializer(serializers.Serializer):
     score = serializers.IntegerField()
 
 class MatchSerializer(serializers.ModelSerializer):
+    current_weather = WeatherSerializer(read_only=True)
+    weather_records = WeatherSerializer(many=True, read_only=True)
+
+
     home_team = TeamSerializer(read_only=True)
     away_team = TeamSerializer(read_only=True)
     home_team_id = serializers.PrimaryKeyRelatedField(queryset=Team.objects.all(), source='home_team', write_only=True)
@@ -32,12 +37,15 @@ class MatchSerializer(serializers.ModelSerializer):
     duration = serializers.DurationField(read_only=True)
     top_scorer = TopPerformerSerializer(read_only=True)
     best_server = TopPerformerSerializer(read_only=True)
+    current_weather = WeatherSerializer(read_only=True)
+    weather_records = WeatherSerializer(many=True, read_only=True)
 
     class Meta:
         model = Match
         fields = ['id', 'home_team', 'away_team', 'home_team_id', 'away_team_id', 'date', 
                   'location', 'latitude', 'longitude', 'status', 'sets', 
-                  'player_performances', 'start_time', 'duration', 'top_scorer', 'best_server']
+                  'player_performances', 'start_time', 'duration', 'top_scorer', 'best_server',
+                  'current_weather', 'weather_records']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'matches',
     'statistic',
     'django_filters',
+    'weather',
 
 ]
 

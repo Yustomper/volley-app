@@ -1,5 +1,6 @@
 // src/services/api.js
 import axios from "axios";
+import { weatherService } from "../../../services/weatherService";
 
 const API_URL = import.meta.env.VITE_BACKEND_API;
 
@@ -40,6 +41,39 @@ const api = {
 
   // Estadísticas
   getMatchStatistics: (matchId) => createAxiosInstance().get(`/api/statistics/match/${matchId}/`),
+
+  
+
+  // Clima
+
+  getWeather: async (latitude, longitude, date) => {
+    try {
+      console.log('Llamando a getWeather con:', { latitude, longitude, date });
+      const weatherData = await weatherService.getWeather(latitude, longitude, date);
+      console.log('Datos del clima obtenidos:', weatherData);
+      return weatherData;
+    } catch (error) {
+      console.error('Error al obtener el clima:', error);
+      throw error;
+    }
+  },
+
+  // Nuevo método updateMatchWeather:
+  // 1. Este método se encarga específicamente de enviar los datos del clima al backend.
+  // 2. Utiliza el endpoint correcto en el backend.
+  updateMatchWeather: async (matchId, weatherData) => {
+    try {
+      const response = await createAxiosInstance().post(`/api/weather/update_match_weather/`, {
+        match_id: matchId,
+        temperature: weatherData.temperature,
+        condition: weatherData.condition
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar el clima en el backend:', error);
+      throw error;
+    }
+  }
 
 };
 

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../../context/ThemeContext'; // Contexto del tema (claro/oscuro)
 import apiClima from '../../../services/api';
 import api from '../services/matchesService';
-
+import { PiGenderFemaleFill, PiGenderMaleFill } from 'react-icons/pi'; // Iconos de género
+import Select from 'react-select';
 import { toast } from 'react-toastify';
 import { debounce } from 'lodash';
 import { IoClose } from "react-icons/io5";
@@ -50,7 +51,7 @@ const MatchFormModal = ({ open, onClose, onSubmit }) => {
 
   const debouncedSearchLocations = debounce(async (query) => {
     if (query.length > 2) {
-      const results = await apiClima.searchLocations(query);  // Aquí usamos la función de búsqueda
+      const results = await apiClima.searchLocations(query);
       setLocations(results);
     } else {
       setLocations([]);
@@ -85,6 +86,53 @@ const MatchFormModal = ({ open, onClose, onSubmit }) => {
     }
   };
 
+  // Definición de las opciones para react-select con iconos
+  const teamOptions = teams.map(team => ({
+    value: team.id,
+    label: (
+      <div className="flex items-center">
+        {team.gender === 'F' ? (
+          <PiGenderFemaleFill className="text-pink-500 mr-2" />
+        ) : (
+          <PiGenderMaleFill className="text-blue-500 mr-2" />
+        )}
+        {team.name}
+      </div>
+    ),
+  }));
+
+// Estilos personalizados para react-select
+const customStyles = {
+  control: (base) => ({
+    ...base,
+    backgroundColor: isDarkMode ? 'rgb(55, 65, 81)' : 'rgb(243, 244, 246)',
+    color: isDarkMode ? 'white' : 'black',
+    borderColor: isDarkMode ? 'rgb(75, 85, 99)' : 'rgb(209, 213, 219)',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: isDarkMode ? 'white' : 'black',  // Color del texto seleccionado
+  }),
+  input: (base) => ({
+    ...base,
+    color: isDarkMode ? 'white' : 'black',  // Color del texto que se escribe
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: isDarkMode ? 'rgb(55, 65, 81)' : 'white',
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused
+      ? isDarkMode
+        ? 'rgb(75, 85, 99)'
+        : 'rgb(229, 231, 235)'
+      : 'transparent',
+    color: isDarkMode ? 'white' : 'black',  // Color de las opciones
+  }),
+};
+
+
   if (!open) return null;
 
   return (
@@ -93,37 +141,27 @@ const MatchFormModal = ({ open, onClose, onSubmit }) => {
         <div className="flex justify-between items-center mb-6">
           <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Crear Partido</h1>
           <button onClick={onClose} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}>
-            <IoClose  className="h-6 w-6" />
+            <IoClose className="h-6 w-6" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select
-              name="home_team_id"
-              value={match.home_team_id}
-              onChange={handleChange}
-              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'}`}
-              required
-            >
-              <option value="">Seleccionar Equipo Local</option>
-              {teams.map(team => (
-                <option key={team.id} value={team.id}>{team.name}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">  
+            {/* Selección de Equipo Local con react-select */}
+            <Select
+              options={teamOptions}
+              styles={customStyles}
+              placeholder="Seleccionar Equipo Local"
+              onChange={(selectedOption) => setMatch({ ...match, home_team_id: selectedOption.value })}
+            />
 
-            <select
-              name="away_team_id"
-              value={match.away_team_id}
-              onChange={handleChange}
-              className={`w-full p-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'}`}
-              required
-            >
-              <option value="">Seleccionar Equipo Visitante</option>
-              {teams.map(team => (
-                <option key={team.id} value={team.id}>{team.name}</option>
-              ))}
-            </select>
+            {/* Selección de Equipo Visitante con react-select */}
+            <Select
+              options={teamOptions}
+              styles={customStyles}
+              placeholder="Seleccionar Equipo Visitante"
+              onChange={(selectedOption) => setMatch({ ...match, away_team_id: selectedOption.value })}
+            />
 
             <input
               type="date"
@@ -143,6 +181,7 @@ const MatchFormModal = ({ open, onClose, onSubmit }) => {
               required
             />
 
+            {/* Ubicación */}
             <div className="relative">
               <input
                 type="text"

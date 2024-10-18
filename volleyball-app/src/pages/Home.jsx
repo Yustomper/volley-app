@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 
-
 const Home = () => {
   const { isDarkMode } = useTheme();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -14,92 +13,99 @@ const Home = () => {
     '/images/volley3.jpg'
   ];
 
+  // Cambio automático de imágenes cada 5 segundos
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
-  
-  useEffect(() => {
-    const wakeUpBackend = async () => {
-      try {
-        await fetch(import.meta.env.VITE_BACKEND_API, {
-          method: 'GET'
-        });
-        console.log('Petición al backend enviada para despertarlo.');
-      } catch (error) {
-        console.error('Error despertando el backend:', error);
-      }
-    };
-
-    wakeUpBackend();
-  }, []);
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
-      <div className="container mx-auto px-4 py-12">
-        <h1 className={`text-4xl font-bold mb-8 text-center ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
-          Bienvenido a la App de Voleibol
+    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}>
+      
+      {/* Encabezado con versiones para dark y light */}
+      <header className={`w-full py-12 text-center ${isDarkMode ? 'bg-gradient-to-r from-purple-500 to-purple-800' : 'bg-gradient-to-r from-orange-500 to-orange-600'}`}>
+        <h1 className="text-6xl font-extrabold text-white tracking-tight mb-4">
+          Bienvenido a tu Plataforma de Voleibol
         </h1>
-        
-        <div className="grid md:grid-cols-2 gap-12 mb-12">
-          <div className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <h2 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Sobre el Voleibol</h2>
-            <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              El voleibol es un deporte de equipo emocionante y dinámico que se juega entre dos equipos de seis jugadores cada uno. 
-              El objetivo es enviar el balón por encima de la red al campo contrario y evitar que toque el suelo en el propio campo.
+        <p className="text-lg text-white opacity-90">
+          Gestiona equipos, organiza partidos y lleva tu pasión por el voleibol al siguiente nivel.
+        </p>
+      </header>
+
+      {/* Sección de contenido principal */}
+      <main className="flex-1 container mx-auto px-6 py-12">
+        {/* Información sobre la plataforma */}
+        <section className="grid md:grid-cols-2 gap-12 mb-16">
+          <div className={`p-8 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+            <h2 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>El deporte del Voleibol</h2>
+            <p className={`text-lg leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              El voleibol es una disciplina de equipo que promueve la cooperación, la estrategia y la velocidad. 
+              En nuestra plataforma, te ofrecemos todas las herramientas necesarias para gestionar tus equipos y disfrutar del juego.
             </p>
           </div>
-          <div className={`p-6 rounded-xl shadow-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <h2 className={`text-2xl font-semibold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Build Recruiting</h2>
-            <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Nuestra función "Build Recruiting" te permite crear y gestionar equipos de voleibol de manera eficiente. 
-              Puedes agregar jugadores, asignar números de camiseta y roles, y mantener un seguimiento de tu plantilla.
+          <div className={`p-8 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+            <h2 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>Crea y Gestiona tus Equipos</h2>
+            <p className={`text-lg leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Con nuestra plataforma, puedes crear, gestionar y llevar el control de tus equipos de voleibol, asignar jugadores, establecer posiciones, y mucho más.
+              Prepárate para la acción dentro y fuera de la cancha.
             </p>
             <Link 
-              to="/equipos" 
-              className={`inline-block px-6 py-3 rounded-full ${
-                isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700'
-              } text-white transition duration-300`}
+              to="/team" 
+              className={`mt-4 inline-block px-6 py-3 rounded-full ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700'} text-white font-semibold text-lg transition duration-300`}
             >
-              Comenzar a Reclutar
+              Comienza a Gestionar tu Equipo
             </Link>
           </div>
-        </div>
-        
-        <div className="mb-12 flex flex-col items-center">
-          <div className="relative w-full max-w-4xl h-96 overflow-hidden rounded-xl">
+        </section>
+
+        {/* Carrusel de imágenes */}
+        <section className="mb-16">
+          <div className="relative w-full max-w-6xl mx-auto h-96 overflow-hidden rounded-lg shadow-xl">
             {images.map((img, index) => (
               <img
                 key={index}
                 src={img}
                 alt={`Volleyball ${index + 1}`}
-                className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
               />
             ))}
           </div>
-          <div className="flex mt-4">
+          {/* Indicadores del carrusel */}
+          <div className="flex justify-center mt-4">
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`w-3 h-3 mx-1 rounded-full ${
-                  index === currentSlide
-                    ? isDarkMode
-                      ? 'bg-purple-400'
-                      : 'bg-orange-600'
-                    : isDarkMode
-                    ? 'bg-gray-600'
-                    : 'bg-gray-300'
+                  index === currentSlide ? (isDarkMode ? 'bg-purple-400' : 'bg-orange-600') : (isDarkMode ? 'bg-gray-600' : 'bg-gray-300')
                 }`}
               />
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+
+        {/* Llamado a la acción */}
+        <section className="text-center">
+          <h2 className={`text-4xl font-bold mb-8 ${isDarkMode ? 'text-purple-400' : 'text-orange-600'}`}>
+            ¿Estás listo para organizar tu próximo partido?
+          </h2>
+          <Link 
+            to="/matches" 
+            className={`px-8 py-4 ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-orange-600 hover:bg-orange-700'} text-white font-semibold rounded-full text-lg transition duration-300`}
+          >
+            Crear Partido Ahora
+          </Link>
+        </section>
+      </main>
+
+      {/* Footer simple */}
+      <footer className="py-8 text-center">
+        <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-700'}`}>
+          © 2024 Plataforma de Voleibol - Todos los derechos reservados.
+        </p>
+      </footer>
     </div>
   );
 };

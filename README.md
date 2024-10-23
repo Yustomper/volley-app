@@ -1,14 +1,16 @@
 
 # Volley App 🏐
 
-[![Django](https://img.shields.io/badge/Django-4.0.5-green)](https://www.djangoproject.com/)
-[![DRF](https://img.shields.io/badge/Django%20Rest%20Framework-3.13.1-red)](https://www.django-rest-framework.org/)
-[![JWT](https://img.shields.io/badge/JWT-JSON%20Web%20Tokens-yellow)](https://jwt.io/)
-[![Swagger](https://img.shields.io/badge/Swagger-API%20Docs-brightgreen)](https://swagger.io/)
-[![React](https://img.shields.io/badge/React-18.0.0-blue)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-2.9-purple)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4)](https://tailwindcss.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14.0-blue)](https://www.postgresql.org/)
+## Tecnologías Utilizadas
+[![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)](https://jwt.io/)
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Neon](https://img.shields.io/badge/Neon-00A699?style=for-the-badge&logo=neon&logoColor=white)](https://neon.tech/)
 
 Volley App es una aplicación de gestión de estadísticas para partidos de voleibol. Permite registrar puntos, jugadas, faltas y partidos ganados. El proyecto está compuesto por un backend en Django y un frontend en React.
 
@@ -16,28 +18,7 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 
 - **Backend (volleyball-back)**: Implementado en Django con Django REST Framework (DRF), JWT para autenticación y Swagger para la documentación de API.
 - **Frontend (volleyball-app)**: Desarrollado en React usando Vite como empaquetador y estilizado con TailwindCSS.
-- **Base de Datos**: PostgreSQL alojada en Atlas.
-
-## Tecnologías Utilizadas
-
-### Frontend:
-- [React](https://reactjs.org/)
-- [Vite](https://vitejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-
-### Backend:
-- [Django](https://www.djangoproject.com/)
-- [Django REST Framework](https://www.django-rest-framework.org/)
-- [JWT (JSON Web Tokens)](https://jwt.io/)
-- [Swagger](https://swagger.io/)
-
-### Base de Datos:
-- [PostgreSQL](https://www.postgresql.org/)
-
-### Deploy:
-- **Backend**: [Render](https://render.com/)
-- **Frontend**: [Vercel](https://vercel.com/)
-- **Base de Datos**: [Atlas](https://www.mongodb.com/atlas/database)
+- **Base de Datos**: PostgreSQL Neon Cloud.
 
 ## API Endpoints
 
@@ -74,6 +55,15 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 | Método | Endpoint                       | Descripción                                      |
 |--------|--------------------------------|--------------------------------------------------|
 | DELETE | `/api/teams/{teamId}/players/{playerId}/` | Eliminar un jugador de un equipo específico.    |
+
+
+## Testing
+Este proyecto incluye una suite de tests implementada con Django Test Framework para asegurar el correcto funcionamiento de la API y la lógica del backend. Para ejecutar los tests, usa el siguiente comando:
+
+
+```
+python manage.py test --keepdb
+```
 
 ---
 

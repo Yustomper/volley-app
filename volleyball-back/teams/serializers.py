@@ -2,6 +2,8 @@
 # teams/serializers.py
 from rest_framework import serializers
 from .models import Team, Player
+from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError as DRFValidationError
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -23,7 +25,11 @@ class TeamSerializer(serializers.ModelSerializer):
         players_data = validated_data.pop('players')
         team = Team.objects.create(**validated_data)
         for player_data in players_data:
-            Player.objects.create(team=team, **player_data)
+            try:
+                # Aquí capturamos la excepción de validación y la transformamos en un DRF ValidationError
+                Player.objects.create(team=team, **player_data)
+            except ValidationError as e:
+                raise DRFValidationError({"player_error": e.messages})
         return team
 
     def update(self, instance, validated_data):
@@ -32,9 +38,12 @@ class TeamSerializer(serializers.ModelSerializer):
         instance.gender = validated_data.get('gender', instance.gender)
         instance.save()
 
-        # Eliminar y recrear jugadores
+        # Eliminar jugadores existentes y recrear jugadores
         instance.players.all().delete()
         for player_data in players_data:
-            Player.objects.create(team=instance, **player_data)
+            try:
+                Player.objects.create(team=instance, **player_data)
+            except ValidationError as e:
+                raise DRFValidationError({"player_error": e.messages})
 
         return instance

@@ -40,6 +40,9 @@ class Player(models.Model):
     DEFAULT_AVATAR_FEMALE = "https://cdn.icon-icons.com/icons2/2643/PNG/512/female_woman_person_people_avatar_icon_159366.png"
 
     def save(self, *args, **kwargs):
+        # Llamar a la validación antes de guardar
+        self.clean()
+
         # Asignar avatar por defecto según el género del equipo
         if not self.avatar:
             if self.team.gender == 'M':
@@ -57,6 +60,8 @@ class Player(models.Model):
         if self.team.gender == 'F' and self.avatar == self.DEFAULT_AVATAR_MALE:
             raise ValidationError(
                 "No puedes agregar un jugador masculino a un equipo femenino.")
+
+        # Otras validaciones necesarias
 
     def __str__(self):
         return f"{self.name} ({self.team.name})"

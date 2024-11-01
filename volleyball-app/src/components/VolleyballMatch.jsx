@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaPlus, FaMinus, FaPlay, FaStop } from 'react-icons/fa';
-import api from '../services/api';
+import matchesService from '../modules/matches/services/matchesService';
 import { useTheme } from '../context/ThemeContext';
 import PointTypeModal from '../modules/matches/components/PointTypeModal'; // Asegúrate de tener el componente modal
+import { matches } from 'lodash';
 
 const VolleyballMatch = () => {
   const { isDarkMode } = useTheme();
@@ -27,7 +28,7 @@ const VolleyballMatch = () => {
     const fetchMatchDetails = async () => {
       try {
         setLoading(true);
-        const response = await api.getMatch(matchId);
+        const response = await matchesService.getMatch(matchId);
   
         if (response && response.data) {
           const matchData = response.data;
@@ -96,7 +97,7 @@ const VolleyballMatch = () => {
       point_type: pointType
     });
     try {
-      await api.updateMatchScore(matchId, {
+      await matchesService.updateMatchScore(matchId, {
         set_number: currentSet,
         home_score: team === 'home' ? newScore : homeScore,
         away_score: team === 'away' ? newScore : awayScore,
@@ -129,7 +130,7 @@ const VolleyballMatch = () => {
     });
 
     try {
-      await api.updateMatchScore(matchId, {
+      await matchesService.updateMatchScore(matchId, {
         set_number: currentSet,
         home_score: team === 'home' ? newScore : homeScore,
         away_score: team === 'away' ? newScore : awayScore
@@ -147,7 +148,7 @@ const VolleyballMatch = () => {
     setAwayScore(0);
 
     try {
-      await api.updateMatchScore(matchId, {
+      await matchesService.updateMatchScore(matchId, {
         set_number: currentSet + 1,
         home_score: 0,
         away_score: 0
@@ -168,7 +169,7 @@ const VolleyballMatch = () => {
     console.log("matchId:", matchId);  // Verificar que el matchId sea correcto
   
     try {
-      const response = await api.startMatch(matchId);
+      const response = await matchesService.startMatch(matchId);
       console.log("Respuesta del backend al iniciar el partido:", response.data);
       if (response.data.start_time) {
         setIsMatchStarted(true);
@@ -186,7 +187,7 @@ const VolleyballMatch = () => {
     const confirmed = window.confirm('¿Estás seguro de que deseas finalizar el partido?');
     if (confirmed) {
       try {
-        await api.endMatch(matchId);
+        await matchesService.endMatch(matchId);
         if (timerRef.current) {
           clearInterval(timerRef.current);
         }
@@ -233,7 +234,7 @@ const VolleyballMatch = () => {
   
     if (playerPerformance) {
       try {
-        await api.updatePlayerPerformance(playerPerformance.id, {
+        await matchesService.updatePlayerPerformance(playerPerformance.id, {
           points: 1,
           pointType: pointType
         });

@@ -17,7 +17,8 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.prefetch_related('players').all()
+    queryset = Team.objects.prefetch_related('players').all().order_by(
+        'created_at') 
     serializer_class = TeamSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

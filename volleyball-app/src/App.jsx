@@ -17,7 +17,8 @@ import Login from './modules/auth/pages/Login';
 import Register from './modules/auth/pages/Register';
 
 import NotFound from './components/NotFound';
-import VolleyballMatch from './components/VolleyballMatch';
+// import VolleyballMatch from './modules/matches/components/VolleyballMatch';
+import MatchControl from './modules/matches/pages/MatchControl';
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
                 <Route path="/match-details/:matchId" element={<MatchDetails />} />
                 <Route path="/statistics" element={<Statistics />} />
                 <Route path="/live-scoreboard/:matchId" element={<LiveScoreBoard />} />
-                <Route path="/volleyball/:matchId" element={<VolleyballMatch />} />
+                <Route path="/volleyball/:matchId" element={<MatchControl />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

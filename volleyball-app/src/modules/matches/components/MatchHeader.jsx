@@ -1,5 +1,6 @@
 import React from 'react';
 import WeatherDisplay from './WeatherDisplay';
+import MatchActions from './MatchActions'; // Añadimos import de MatchActions
 
 const MatchHeader = ({ 
   match, 
@@ -52,7 +53,14 @@ const MatchHeader = ({
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center relative"> {/* Añadimos relative para posicionamiento de MatchActions */}
+      {/* Añadimos MatchActions aquí, pasando el ID del match */}
+      <MatchActions 
+        matchId={match.id} // Pasamos el ID del match
+        onEdit={() => {}} // Implementa estas funciones según necesites
+        onDelete={() => {}}
+      />
+
       <div className="flex justify-between items-center w-full mb-4">
         <div className="text-center w-1/3">
           <h2 className="text-3xl font-bold">{match.home_team.name}</h2>

@@ -1,14 +1,16 @@
 
 # Volley App 🏐
 
-[![Django](https://img.shields.io/badge/Django-4.0.5-green)](https://www.djangoproject.com/)
-[![DRF](https://img.shields.io/badge/Django%20Rest%20Framework-3.13.1-red)](https://www.django-rest-framework.org/)
-[![JWT](https://img.shields.io/badge/JWT-JSON%20Web%20Tokens-yellow)](https://jwt.io/)
-[![Swagger](https://img.shields.io/badge/Swagger-API%20Docs-brightgreen)](https://swagger.io/)
-[![React](https://img.shields.io/badge/React-18.0.0-blue)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-2.9-purple)](https://vitejs.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4)](https://tailwindcss.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14.0-blue)](https://www.postgresql.org/)
+## Tecnologías Utilizadas
+[![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)](https://jwt.io/)
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io/)
+[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Neon](https://img.shields.io/badge/Neon-00A699?style=for-the-badge&logo=neon&logoColor=white)](https://neon.tech/)
 
 Volley App es una aplicación de gestión de estadísticas para partidos de voleibol. Permite registrar puntos, jugadas, faltas y partidos ganados. El proyecto está compuesto por un backend en Django y un frontend en React.
 
@@ -16,28 +18,7 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 
 - **Backend (volleyball-back)**: Implementado en Django con Django REST Framework (DRF), JWT para autenticación y Swagger para la documentación de API.
 - **Frontend (volleyball-app)**: Desarrollado en React usando Vite como empaquetador y estilizado con TailwindCSS.
-- **Base de Datos**: PostgreSQL alojada en Atlas.
-
-## Tecnologías Utilizadas
-
-### Frontend:
-- [React](https://reactjs.org/)
-- [Vite](https://vitejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-
-### Backend:
-- [Django](https://www.djangoproject.com/)
-- [Django REST Framework](https://www.django-rest-framework.org/)
-- [JWT (JSON Web Tokens)](https://jwt.io/)
-- [Swagger](https://swagger.io/)
-
-### Base de Datos:
-- [PostgreSQL](https://www.postgresql.org/)
-
-### Deploy:
-- **Backend**: [Render](https://render.com/)
-- **Frontend**: [Vercel](https://vercel.com/)
-- **Base de Datos**: [Atlas](https://www.mongodb.com/atlas/database)
+- **Base de Datos**: PostgreSQL Neon Cloud.
 
 ## API Endpoints
 
@@ -55,9 +36,9 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 |--------|--------------------|---------------------------------------------|
 | GET    | `/api/teams/`      | Obtener todos los equipos con paginación, búsqueda y ordenamiento. |
 | POST   | `/api/teams/`      | Crear un nuevo equipo.                      |
-| GET    | `/api/teams/{id}/` | Obtener los detalles de un equipo específico. |
-| PUT    | `/api/teams/{id}/` | Actualizar un equipo existente.             |
-| DELETE | `/api/teams/{id}/` | Eliminar un equipo específico.              |
+| GET    | `/api/teams/{team_id}/` | Obtener los detalles de un equipo específico. |
+| PUT    | `/api/teams/{team_id}/` | Actualizar un equipo existente.             |
+| DELETE | `/api/teams/{team_id}/` | Eliminar un equipo específico.              |
 
 ### Gestión de Jugadores (Players)
 
@@ -65,15 +46,39 @@ Volley App es una aplicación de gestión de estadísticas para partidos de vole
 |--------|----------------------------|---------------------------------------------|
 | GET    | `/api/teams/players/`      | Obtener todos los jugadores con paginación, búsqueda y ordenamiento. |
 | POST   | `/api/teams/players/`      | Crear un nuevo jugador.                    |
-| GET    | `/api/teams/players/{id}/` | Obtener los detalles de un jugador específico. |
-| PUT    | `/api/teams/players/{id}/` | Actualizar los detalles de un jugador.     |
-| DELETE | `/api/teams/players/{id}/` | Eliminar un jugador específico.             |
+| GET    | `/api/teams/players/{player_id}/` | Obtener los detalles de un jugador específico. |
+| PUT    | `/api/teams/players/{player_id}/` | Actualizar los detalles de un jugador.     |
+| DELETE | `/api/teams/players/{player_id}/` | Eliminar un jugador específico.             |
 
 ### Operaciones de Jugadores en Equipos
 
 | Método | Endpoint                       | Descripción                                      |
 |--------|--------------------------------|--------------------------------------------------|
-| DELETE | `/api/teams/{teamId}/players/{playerId}/` | Eliminar un jugador de un equipo específico.    |
+| DELETE | `/api/teams/{team_id}/players/{player_id}/` | Eliminar un jugador de un equipo específico.    |
+
+
+### Gestión de Partidos (Matches)
+
+| Método | Endpoint                   | Descripción                                 |
+|--------|----------------------------|---------------------------------------------|
+| GET    | `/api/matches/`            | Obtener todos los Partidos con paginación, búsqueda y ordenamiento. |
+| GET    | `/api/matches/{match_id}/`       | Obtener los detalles de un partido específico. |
+| POST   | `/api/matches/{match_id}/start/` | Inicia un partido programado.                    |
+| POST    | `/api/matches/{match_id}/end/`   | Finaliza un partido en curso. |
+| POST    | `/api/matches/{match_id}/end/`   | Finaliza un partido en curso. |
+| POST    | `/api/matches/{match_id}/suspend/`   | Suspende un partido en curso. |
+| POST    | `/api/matches/{match_id}/reschedule/`   | Reprograma un partido para una nueva fecha. |
+| PATCH    | `/api/matches/{match_id}/update_score/` | Actualiza el puntaje de un set específico - Rollback incluyendo `"undo": true`  |
+| POST | `/api/matches/{match_id}/sets/{set_id}/update_timeouts/` | Eliminar un jugador específico.             |
+
+
+## Testing
+Este proyecto incluye una suite de tests implementada con Django Test Framework para asegurar el correcto funcionamiento de la API y la lógica del backend. Para ejecutar los tests, usa el siguiente comando:
+
+
+```
+python manage.py test --keepdb
+```
 
 ---
 
